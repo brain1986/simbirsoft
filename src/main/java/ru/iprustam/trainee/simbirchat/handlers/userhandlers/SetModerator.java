@@ -1,4 +1,12 @@
-package ru.iprustam.trainee.simbirchat.operations.userops;
+package ru.iprustam.trainee.simbirchat.handlers.userhandlers;
 
-public class SetModerator {
+import ru.iprustam.trainee.simbirchat.handlers.Handler;
+import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleResult;
+import ru.iprustam.trainee.simbirchat.message.ChatMessage;
+
+public class SetModerator extends Handler {
+    @Override
+    public HandleResult doHandle(ChatMessage chatMessage) {
+        return new HandleResult();
+    }
 }

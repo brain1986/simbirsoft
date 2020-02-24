@@ -1,10 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Chat</title>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/chat.css" rel="stylesheet">
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        var username = /*[[${username}]]*/ 'guest';
+        var usergroup = /*[[${usergroup}]]*/ 2;
+
+        /*]]>*/
+    </script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
 </head>
 <body>
-$END$
+<noscript><h2 style="color: #ff0000">Javascript is not supported</h2></noscript>
+
+<div id="main-content" class="container">
+    <div class="row">
+        <h3 th:text="${username}"></h3>
+    </div>
+    <div class="row">
+        <div class="col-md-8 table-wrapper-scroll-y my-custom-scrollbar">
+            <table id="messages-container" class="table table-bordered table-striped mb-0">
+                <thead>
+                <tr>
+                    <th>Сообщения:</th>
+                </tr>
+                </thead>
+                <tbody id="messages-table">
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4 table-wrapper-scroll-y my-custom-scrollbar">
+            <table id="users-container" class="table table-bordered table-striped mb-0">
+                <thead>
+                <tr>
+                    <th>Юзеры в комнате:</th>
+                </tr>
+                </thead>
+                <tbody id="users-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <textarea name="message" id="message" class="form-control" required autofocus placeholder="Напишите что-нибудь..." ></textarea>
+        </div>
+        <div class="col-md-2">
+            <input type="button" class="btn btn-lg btn-primary btn-block" id="send-button" value="Отправить" />
+        </div>
+    </div>
+</div>
 </body>
 </html>

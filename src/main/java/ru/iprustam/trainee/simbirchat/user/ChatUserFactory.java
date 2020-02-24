@@ -5,9 +5,9 @@ import ru.iprustam.trainee.simbirchat.handlers.messagehandlers.*;
 import ru.iprustam.trainee.simbirchat.handlers.roomhandlers.*;
 import ru.iprustam.trainee.simbirchat.handlers.userhandlers.*;
 
-public class UserFactory {
-    public static User createAdmin() {
-        AdminUser user = new AdminUser();
+public class ChatUserFactory {
+    public static ChatUser createAdmin() {
+        AdminChatUser user = new AdminChatUser();
         Handler handlerChain = new LockUser()
                 .setNext(new UnlockUser())
                 .setNext(new SetModerator())
@@ -26,16 +26,16 @@ public class UserFactory {
         return user;
     }
 
-    public static User createBot() {
-        BotUser user = new BotUser();
+    public static ChatUser createBot() {
+        BotChatUser user = new BotChatUser();
         Handler handlerChain = null;
 
         user.setUserActions(handlerChain);
         return user;
     }
 
-    public static User createModerator() {
-        ModeratorUser user = new ModeratorUser();
+    public static ChatUser createModerator() {
+        ModeratorChatUser user = new ModeratorChatUser();
         Handler handlerChain = new LockUser()
                 .setNext(new UnlockUser())
                 .setNext(new SetModerator())
@@ -50,8 +50,8 @@ public class UserFactory {
         return user;
     }
 
-    public static User createOrdinaryUser() {
-        OrdinaryUser user = new OrdinaryUser();
+    public static ChatUser createOrdinaryUser() {
+        OrdinaryChatUser user = new OrdinaryChatUser();
         Handler handlerChain = new SendMessage()
                 .setNext(new ReceiveMessage())
                 .setNext(new CreateOrdinaryRoom())
@@ -62,8 +62,8 @@ public class UserFactory {
         return user;
     }
 
-    public static User createUnknownUser() {
-        UnknownUser user = new UnknownUser();
+    public static ChatUser createUnknownUser() {
+        UnknownChatUser user = new UnknownChatUser();
         Handler handlerChain = null;
 
         user.setUserActions(handlerChain);

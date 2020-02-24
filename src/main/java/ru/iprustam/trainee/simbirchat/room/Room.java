@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.entities.room;
+package ru.iprustam.trainee.simbirchat.room;
 
-public class Room {
+public abstract class Room {
 }

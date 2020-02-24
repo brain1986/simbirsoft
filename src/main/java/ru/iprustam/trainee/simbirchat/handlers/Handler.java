@@ -3,7 +3,7 @@ package ru.iprustam.trainee.simbirchat.handlers;
 import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleDetails;
 import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleErrorType;
 import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleResult;
-import ru.iprustam.trainee.simbirchat.message.Message;
+import ru.iprustam.trainee.simbirchat.message.ChatMessage;
 
 /**
  * Абстрактный класс для реализации паттерна Chain of responsibility
@@ -12,12 +12,12 @@ import ru.iprustam.trainee.simbirchat.message.Message;
 public abstract class Handler {
     protected Handler next;
 
-    public final HandleResult handle(Message message) {
-        if(canHandle(message))
-            return doHandle(message);
+    public final HandleResult handle(ChatMessage chatMessage) {
+        if(canHandle(chatMessage))
+            return doHandle(chatMessage);
         else
             if (next != null)
-                return next.handle(message);
+                return next.handle(chatMessage);
             else
                 return new HandleResult(HandleErrorType.ERROR,
                         new HandleDetails("No methods in the chain to accomplish operation"));
@@ -28,8 +28,8 @@ public abstract class Handler {
         return this;
     }
 
-    protected boolean canHandle(Message message) {
+    protected boolean canHandle(ChatMessage chatMessage) {
         return false;
     }
-    protected abstract HandleResult doHandle(Message message);
+    protected abstract HandleResult doHandle(ChatMessage chatMessage);
 }

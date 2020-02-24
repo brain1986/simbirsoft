@@ -1,6 +1,6 @@
 package ru.iprustam.trainee.simbirchat.websocket.models;
 
-public class WsIngoingMessage {
+public class WsIngoing {
 
     private String message;
     private String username;
@@ -13,10 +13,10 @@ public class WsIngoingMessage {
         this.username = username;
     }
 
-    public WsIngoingMessage() {
+    public WsIngoing() {
     }
 
-    public WsIngoingMessage(String message) {
+    public WsIngoing(String message) {
         this.message = message;
     }
 
@@ -27,4 +27,5 @@ public class WsIngoingMessage {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

@@ -1,15 +1,16 @@
 package ru.iprustam.trainee.simbirchat.websocket.models;
 
-public class WsOutgoingMessage {
+public class WsOutgoingNewMessage extends WsOutgoing{
     private Integer roomId;
     private String user;
     private String message;
     private String time;
 
-    public WsOutgoingMessage() {
+    public WsOutgoingNewMessage() {
+        this.setType("message-event");
     }
 
-    public WsOutgoingMessage(String message) {
+    public WsOutgoingNewMessage(String message) {
         this.message = message;
     }
 

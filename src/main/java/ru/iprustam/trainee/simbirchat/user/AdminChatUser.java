@@ -1,7 +1,7 @@
 package ru.iprustam.trainee.simbirchat.user;
 
-public final class AdminUser extends User {
-    protected AdminUser() {
+public final class AdminChatUser extends ChatUser {
+    protected AdminChatUser() {
 
     }
 }
