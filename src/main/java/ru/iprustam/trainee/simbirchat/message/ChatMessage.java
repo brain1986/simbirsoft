@@ -1,17 +1,17 @@
 package ru.iprustam.trainee.simbirchat.message;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /** Этот класс часть паттерна Bridge
  * Представляет собой сообщение для чата. Содержит внутри себя
  * возможность вставить дополнительный ресурс, типа видео
  */
-public abstract class Message {
+public abstract class ChatMessage {
     private int messageId;
     private int roomId;
     private int userId;
     private String message;
-    private LocalDateTime time;
+    private ZonedDateTime time;
 
     public MessageResource getResource() {
         return resource;
@@ -53,5 +53,13 @@ public abstract class Message {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public ZonedDateTime getTime() {
+        return time;
+    }
+
+    public void setTime(ZonedDateTime time) {
+        this.time = time;
     }
 }

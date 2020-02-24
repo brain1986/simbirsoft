@@ -6,19 +6,21 @@ import ru.iprustam.trainee.simbirchat.user.ChatUser;
 import java.util.List;
 
 @Component
-public class UserRepo implements UserRepository {
+public class ChatUserRepo implements ChatUserRepository {
+
+
     @Override
     public void addUser(ChatUser user) {
-        
-    }
-
-    @Override
-    public void deleteUser(int userId) {
 
     }
 
     @Override
-    public ChatUser findUserById(int userId) {
+    public void deleteUser(Integer userId) {
+
+    }
+
+    @Override
+    public ChatUser findUserById(Integer userId) {
         return null;
     }
 

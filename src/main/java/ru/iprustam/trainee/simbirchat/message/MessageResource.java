@@ -1,4 +1,9 @@
 package ru.iprustam.trainee.simbirchat.message;
 
-public class MessageResource {
+/**
+ * Этот интерфейс часть паттерна Bridge, для реализации дополнительных
+ * элементов в текстовом сообщении
+ */
+public interface MessageResource {
+    String getContent();
 }

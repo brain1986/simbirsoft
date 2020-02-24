@@ -1,4 +1,5 @@
 package ru.iprustam.trainee.simbirchat.handlers.handleresults;
 
-public interface ErrorType {
+public enum HandleErrorType {
+    OK, ERROR;
 }

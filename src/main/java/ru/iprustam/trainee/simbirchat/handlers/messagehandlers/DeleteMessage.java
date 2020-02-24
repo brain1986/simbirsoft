@@ -1,4 +1,13 @@
-package ru.iprustam.trainee.simbirchat.operations.messageops;
+package ru.iprustam.trainee.simbirchat.handlers.messagehandlers;
 
-public class DeleteMessage {
+import ru.iprustam.trainee.simbirchat.handlers.Handler;
+import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleResult;
+import ru.iprustam.trainee.simbirchat.message.ChatMessage;
+
+public class DeleteMessage extends Handler {
+    @Override
+    public HandleResult doHandle(ChatMessage chatMessage) {
+        return new HandleResult();
+    }
+
 }

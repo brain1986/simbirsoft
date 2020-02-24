@@ -1,4 +1,6 @@
 package ru.iprustam.trainee.simbirchat.room;
 
-public class PrivateRoom {
+public class PrivateRoom extends Room {
+    protected PrivateRoom(){
+    }
 }
