@@ -1,9 +1,9 @@
-package ru.iprustam.trainee.simbirchat.handlers;
+package ru.iprustam.trainee.simbirchat.handler;
 
-import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleDetails;
-import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleErrorType;
-import ru.iprustam.trainee.simbirchat.handlers.handleresults.HandleResult;
-import ru.iprustam.trainee.simbirchat.message.ChatMessage;
+import ru.iprustam.trainee.simbirchat.handler.handleresult.HandleDetails;
+import ru.iprustam.trainee.simbirchat.handler.handleresult.HandleErrorType;
+import ru.iprustam.trainee.simbirchat.handler.handleresult.HandleResult;
+import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 
 /**
  * Абстрактный класс для реализации паттерна Chain of responsibility

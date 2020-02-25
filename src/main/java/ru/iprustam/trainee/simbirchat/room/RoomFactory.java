@@ -2,18 +2,18 @@ package ru.iprustam.trainee.simbirchat.room;
 
 public class RoomFactory {
 
-    public static Room createPublicRoom() {
-        PublicRoom room = new PublicRoom();
-        return room;
-    }
-
-    public static Room createPrivateRoom() {
-        PrivateRoom room = new PrivateRoom();
-        return room;
-    }
-
-    public static Room createBotRoom() {
-        BotRoom room = new BotRoom();
-        return room;
-    }
+//    public static ChatRoom createPublicRoom() {
+//        PublicRoom room = new PublicRoom();
+//        return room;
+//    }
+//
+//    public static ChatRoom createPrivateRoom() {
+//        PrivateRoom room = new PrivateRoom();
+//        return room;
+//    }
+//
+//    public static ChatRoom createBotRoom() {
+//        BotRoom room = new BotRoom();
+//        return room;
+//    }
 }

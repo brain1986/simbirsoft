@@ -1,16 +1,37 @@
-package ru.iprustam.trainee.simbirchat.user;
+package ru.iprustam.trainee.simbirchat.entity;
 
 import ru.iprustam.trainee.simbirchat.handler.Handler;
 
-public abstract class ChatUser {
-    private int userId;
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+@Table(name = "usr")
+public class ChatUser {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
+    private String username;
+    private String password;
+
+    @ManyToMany(mappedBy = "users")
+    private Set<ChatRoom> rooms;
+
+    @OneToMany(mappedBy="chatUser")
+    private Set<ChatMessage> messages;
+
+    @ManyToOne
+    @JoinColumn(name="role_id", nullable=false)
+    private ChatUserRole role;
+
+    @Transient
     private Handler userActions;
 
-    public int getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

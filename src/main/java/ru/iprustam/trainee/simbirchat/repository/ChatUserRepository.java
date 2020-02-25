@@ -1,12 +1,13 @@
-package ru.iprustam.trainee.simbirchat.repos;
+package ru.iprustam.trainee.simbirchat.repository;
 
-import ru.iprustam.trainee.simbirchat.user.ChatUser;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 
-import java.util.List;
-
-public interface ChatUserRepository {
-    void addUser(ChatUser user);
-    void deleteUser(Integer userId);
-    ChatUser findUserById(Integer userId);
-    List<ChatUser> findAllUsers();
+@Repository
+public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
+//    void addUser(ChatUser user);
+//    void deleteUser(Integer userId);
+//    ChatUser findUserById(Integer userId);
+//    List<ChatUser> findAllUsers();
 }
