@@ -1,6 +1,6 @@
 package ru.iprustam.trainee.simbirchat.user;
 
-import ru.iprustam.trainee.simbirchat.handlers.Handler;
+import ru.iprustam.trainee.simbirchat.handler.Handler;
 
 public abstract class ChatUser {
     private int userId;

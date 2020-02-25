@@ -1,9 +1,10 @@
 package ru.iprustam.trainee.simbirchat.user;
 
-import ru.iprustam.trainee.simbirchat.handlers.Handler;
-import ru.iprustam.trainee.simbirchat.handlers.messagehandlers.*;
-import ru.iprustam.trainee.simbirchat.handlers.roomhandlers.*;
-import ru.iprustam.trainee.simbirchat.handlers.userhandlers.*;
+import ru.iprustam.trainee.simbirchat.entity.ChatUser;
+import ru.iprustam.trainee.simbirchat.handler.Handler;
+import ru.iprustam.trainee.simbirchat.handler.messagehandler.*;
+import ru.iprustam.trainee.simbirchat.handler.roomhandler.*;
+import ru.iprustam.trainee.simbirchat.handler.userhandler.*;
 
 public class ChatUserFactory {
     public static ChatUser createAdmin() {
