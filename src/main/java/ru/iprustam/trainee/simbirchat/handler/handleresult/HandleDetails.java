@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.handlers.handleresults;
+package ru.iprustam.trainee.simbirchat.handler.handleresult;
 
 public class HandleDetails {
     private String text;

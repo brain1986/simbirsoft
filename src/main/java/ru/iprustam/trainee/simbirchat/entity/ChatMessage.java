@@ -1,50 +1,51 @@
-package ru.iprustam.trainee.simbirchat.message;
+package ru.iprustam.trainee.simbirchat.entity;
 
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /** Этот класс часть паттерна Bridge
  * Представляет собой сообщение для чата. Содержит внутри себя
  * возможность вставить дополнительный ресурс, типа видео
  */
-public abstract class ChatMessage {
-    private int messageId;
-    private int roomId;
-    private int userId;
+@Entity
+@Table(name = "message")
+public class ChatMessage {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long messageId;
     private String message;
-    private ZonedDateTime time;
+    private ZonedDateTime messageTime;
 
-    public MessageResource getResource() {
-        return resource;
-    }
+    @ManyToOne
+    @JoinColumn(name="room_id", nullable=false)
+    private ChatRoom chatRoom;
 
-    public void setResource(MessageResource resource) {
-        this.resource = resource;
-    }
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=false)
+    private ChatUser chatUser;
 
-    private MessageResource resource;
-
-    public int getMessageId() {
+    public Long getMessageId() {
         return messageId;
     }
 
-    public void setMessageId(int messageId) {
+    public void setMessageId(Long messageId) {
         this.messageId = messageId;
     }
 
-    public int getRoomId() {
-        return roomId;
+    public ChatRoom getChatRoom() {
+        return chatRoom;
     }
 
-    public void setRoomId(int roomId) {
-        this.roomId = roomId;
+    public void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
     }
 
-    public int getUserId() {
-        return userId;
+    public ChatUser getChatUser() {
+        return chatUser;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setChatUser(ChatUser chatUser) {
+        this.chatUser = chatUser;
     }
 
     public String getMessage() {
@@ -55,11 +56,13 @@ public abstract class ChatMessage {
         this.message = message;
     }
 
-    public ZonedDateTime getTime() {
-        return time;
+    public ZonedDateTime getMessageTime() {
+        return messageTime;
     }
 
-    public void setTime(ZonedDateTime time) {
-        this.time = time;
+    public void setMessageTime(ZonedDateTime messageTime) {
+        this.messageTime = messageTime;
     }
+
+
 }

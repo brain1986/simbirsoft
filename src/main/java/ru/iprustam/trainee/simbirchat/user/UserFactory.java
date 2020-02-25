@@ -6,9 +6,9 @@ import ru.iprustam.trainee.simbirchat.handler.messagehandler.*;
 import ru.iprustam.trainee.simbirchat.handler.roomhandler.*;
 import ru.iprustam.trainee.simbirchat.handler.userhandler.*;
 
-public class ChatUserFactory {
+public class UserFactory {
     public static ChatUser createAdmin() {
-        AdminChatUser user = new AdminChatUser();
+        ChatUser user = new ChatUser();
         Handler handlerChain = new LockUser()
                 .setNext(new UnlockUser())
                 .setNext(new SetModerator())
@@ -28,7 +28,7 @@ public class ChatUserFactory {
     }
 
     public static ChatUser createBot() {
-        BotChatUser user = new BotChatUser();
+        ChatUser user = new ChatUser();
         Handler handlerChain = null;
 
         user.setUserActions(handlerChain);
@@ -36,7 +36,7 @@ public class ChatUserFactory {
     }
 
     public static ChatUser createModerator() {
-        ModeratorChatUser user = new ModeratorChatUser();
+        ChatUser user = new ChatUser();
         Handler handlerChain = new LockUser()
                 .setNext(new UnlockUser())
                 .setNext(new SetModerator())
@@ -52,7 +52,7 @@ public class ChatUserFactory {
     }
 
     public static ChatUser createOrdinaryUser() {
-        OrdinaryChatUser user = new OrdinaryChatUser();
+        ChatUser user = new ChatUser();
         Handler handlerChain = new SendMessage()
                 .setNext(new ReceiveMessage())
                 .setNext(new CreateOrdinaryRoom())
@@ -64,7 +64,7 @@ public class ChatUserFactory {
     }
 
     public static ChatUser createUnknownUser() {
-        UnknownChatUser user = new UnknownChatUser();
+        ChatUser user = new ChatUser();
         Handler handlerChain = null;
 
         user.setUserActions(handlerChain);

@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.websocket.controllers;
+package ru.iprustam.trainee.simbirchat.websocket.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -10,12 +10,12 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import org.springframework.web.util.HtmlUtils;
-import ru.iprustam.trainee.simbirchat.repos.ChatMessageRepository;
-import ru.iprustam.trainee.simbirchat.repos.ChatUserRepository;
-import ru.iprustam.trainee.simbirchat.repos.RoomRepository;
-import ru.iprustam.trainee.simbirchat.websocket.models.WsIngoing;
-import ru.iprustam.trainee.simbirchat.websocket.models.WsOutgoingNewMessage;
-import ru.iprustam.trainee.simbirchat.websocket.models.WsOutgoingUserList;
+import ru.iprustam.trainee.simbirchat.repository.ChatMessageRepository;
+import ru.iprustam.trainee.simbirchat.repository.ChatUserRepository;
+import ru.iprustam.trainee.simbirchat.repository.ChatRoomRepository;
+import ru.iprustam.trainee.simbirchat.websocket.model.WsIngoing;
+import ru.iprustam.trainee.simbirchat.websocket.model.WsOutgoingNewMessage;
+import ru.iprustam.trainee.simbirchat.websocket.model.WsOutgoingUserList;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -28,7 +28,7 @@ public class WebSocketController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
-    private RoomRepository roomRepository;
+    private ChatRoomRepository chatRoomRepository;
     @Autowired
     private ChatMessageRepository chatMessageRepository;
     @Autowired

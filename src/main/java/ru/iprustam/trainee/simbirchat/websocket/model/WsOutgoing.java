@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.websocket.models;
+package ru.iprustam.trainee.simbirchat.websocket.model;
 
 public class WsOutgoing {
     private String type;

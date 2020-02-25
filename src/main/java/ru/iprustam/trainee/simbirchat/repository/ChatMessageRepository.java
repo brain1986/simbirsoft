@@ -1,12 +1,13 @@
-package ru.iprustam.trainee.simbirchat.repos;
+package ru.iprustam.trainee.simbirchat.repository;
 
-import ru.iprustam.trainee.simbirchat.message.ChatMessage;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 
-import java.util.Collection;
-
-public interface ChatMessageRepository {
-    void addMessage(ChatMessage message);
-    void deleteMessage(Integer messageId);
-    ChatMessage findMessageById(Integer messageId);
-    Collection<ChatMessage> findAllMessages();
+@Repository
+public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
+//    void addMessage(ChatMessage message);
+//    void deleteMessage(Integer messageId);
+//    ChatMessage findMessageById(Integer messageId);
+//    Collection<ChatMessage> findAllMessages();
 }

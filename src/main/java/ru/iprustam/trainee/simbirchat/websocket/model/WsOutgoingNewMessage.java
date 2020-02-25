@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.websocket.models;
+package ru.iprustam.trainee.simbirchat.websocket.model;
 
 public class WsOutgoingNewMessage extends WsOutgoing{
     private Integer roomId;
