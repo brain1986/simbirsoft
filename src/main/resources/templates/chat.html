@@ -7,10 +7,8 @@
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
-
-        var username = /*[[${username}]]*/ 'guest';
-        var usergroup = /*[[${usergroup}]]*/ 2;
-
+        var csrfHeaderName = /*[[${_csrf.headerName}]]*/ '';
+        var csrfHeaderValue = /*[[${_csrf.token}]]*/ '';
         /*]]>*/
     </script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
@@ -23,29 +21,40 @@
 <div id="main-content" class="container">
     <div class="row">
         <h3 th:text="${username}"></h3>
+        <div id="welcome-user"></div>
     </div>
     <div class="row">
-        <div class="col-md-8 table-wrapper-scroll-y my-custom-scrollbar">
-            <table id="messages-container" class="table table-bordered table-striped mb-0">
-                <thead>
-                <tr>
-                    <th>Сообщения:</th>
-                </tr>
-                </thead>
-                <tbody id="messages-table">
-                </tbody>
-            </table>
+        <div class="col-md-12" id="room-buttons">
+
         </div>
-        <div class="col-md-4 table-wrapper-scroll-y my-custom-scrollbar">
-            <table id="users-container" class="table table-bordered table-striped mb-0">
-                <thead>
-                <tr>
-                    <th>Юзеры в комнате:</th>
-                </tr>
-                </thead>
-                <tbody id="users-table">
-                </tbody>
-            </table>
+    </div>
+    <div class="row">
+        <div id="message-and-users-placeholder" style="display: none">
+            <div class="col-md-8 table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table table-bordered table-striped mb-0 messages-container">
+                    <thead>
+                    <tr>
+                        <th>Сообщения:</th>
+                    </tr>
+                    </thead>
+                    <tbody class="messages-table">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-4 table-wrapper-scroll-y my-custom-scrollbar">
+                <table class="table table-bordered table-striped mb-0 users-container">
+                    <thead>
+                    <tr>
+                        <th>Юзеры в комнате:</th>
+                    </tr>
+                    </thead>
+                    <tbody class="users-table">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="chat-block">
         </div>
     </div>
     <div class="row">

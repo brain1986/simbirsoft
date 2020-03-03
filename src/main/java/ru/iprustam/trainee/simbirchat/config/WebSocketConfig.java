@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.websocket.config;
+package ru.iprustam.trainee.simbirchat.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,8 +12,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/queue", "/topic");
+        config.setApplicationDestinationPrefixes("/app", "/user", "/topic");
+        //config.setUserDestinationPrefix("/user");
     }
 
     @Override

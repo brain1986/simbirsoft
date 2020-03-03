@@ -3,10 +3,6 @@ package ru.iprustam.trainee.simbirchat.entity;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
-/** Этот класс часть паттерна Bridge
- * Представляет собой сообщение для чата. Содержит внутри себя
- * возможность вставить дополнительный ресурс, типа видео
- */
 @Entity
 @Table(name = "message")
 public class ChatMessage {
@@ -17,7 +13,7 @@ public class ChatMessage {
     private ZonedDateTime messageTime;
 
     @ManyToOne
-    @JoinColumn(name="room_id", nullable=false)
+    @JoinColumn(name="room_id")//, nullable=false)
     private ChatRoom chatRoom;
 
     @ManyToOne
