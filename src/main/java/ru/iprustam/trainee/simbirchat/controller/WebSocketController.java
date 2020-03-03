@@ -1,59 +1,48 @@
-package ru.iprustam.trainee.simbirchat.websocket.controller;
+package ru.iprustam.trainee.simbirchat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.support.GenericMessage;
-import org.springframework.web.socket.messaging.SessionSubscribeEvent;
-import org.springframework.web.util.HtmlUtils;
-import ru.iprustam.trainee.simbirchat.repository.ChatMessageRepository;
-import ru.iprustam.trainee.simbirchat.repository.ChatUserRepository;
-import ru.iprustam.trainee.simbirchat.repository.ChatRoomRepository;
-import ru.iprustam.trainee.simbirchat.websocket.model.WsIngoing;
-import ru.iprustam.trainee.simbirchat.websocket.model.WsOutgoingNewMessage;
-import ru.iprustam.trainee.simbirchat.websocket.model.WsOutgoingUserList;
+import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import org.springframework.stereotype.Controller;
+import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
+import ru.iprustam.trainee.simbirchat.service.WsChatService;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-
+@Controller
 public class WebSocketController {
-    //Temporal
-    ArrayList<String> activeUsers = new ArrayList<>();
+
+    private final SimpMessagingTemplate messagingTemplate;
+    private final WsChatService wsChatService;
 
     @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-    @Autowired
-    private ChatRoomRepository chatRoomRepository;
-    @Autowired
-    private ChatMessageRepository chatMessageRepository;
-    @Autowired
-    private ChatUserRepository chatUserRepository;
-
-    @EventListener
-    public void handleSessionSubscribeEvent(SessionSubscribeEvent event) {
-        GenericMessage message = (GenericMessage) event.getMessage();
-        //String simpSessionId = (String) message.getHeaders().get("simpSessionId");
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String username = headerAccessor.getFirstNativeHeader("username");
-        activeUsers.add(username);
-
-        messagingTemplate.convertAndSend("/queue/chat-updates", new WsOutgoingUserList(activeUsers));
+    public WebSocketController(SimpMessagingTemplate messagingTemplate, WsChatService wsChatService) {
+        this.messagingTemplate = messagingTemplate;
+        this.wsChatService = wsChatService;
     }
 
-    @SendTo("/queue/chat-updates")
-    @MessageMapping("/send-message")
-    public WsOutgoingNewMessage sendMessage(WsIngoing message, @Header("simpSessionId") String sessionId) {
-        WsOutgoingNewMessage outgoingMessage = new WsOutgoingNewMessage();
-        outgoingMessage.setUser(message.getUsername());
-        outgoingMessage.setTime(ZonedDateTime.now(ZoneId.systemDefault()).toString());
-        outgoingMessage.setRoomId(1);
-        outgoingMessage.setMessage(HtmlUtils.htmlEscape(message.getMessage()));
+    @SubscribeMapping("/queue/rooms-common-events")
+    public void roomsCommonEventsSubscribe() {
+        wsChatService.subscribe();
+    }
 
-        return outgoingMessage;
+    //todo: запретить subscribe к /topic/room-concrete/{roomId}, если юзер не добавлен к данной комнате
+
+    @SubscribeMapping("/room-concrete/{roomId}")
+    public void roomConcreteSubscribe(@DestinationVariable Long roomId) {
+        wsChatService.messagesLoad(roomId);
+    }
+
+    @MessageMapping("/message-send/{roomId}")
+    public void messageSend(ChatMessage message, @DestinationVariable Long roomId) {
+        wsChatService.messageSend(message, roomId);
+    }
+
+    @MessageExceptionHandler
+    @SendToUser("/queue/errors")
+    public String handleException(Throwable exception) {
+        return exception.getMessage();
     }
 }
