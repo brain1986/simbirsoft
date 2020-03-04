@@ -1,66 +1,70 @@
-Для запуска требуется JDK 11
 
-после запуска использовать URL:
-localhost:8080/login
+Для запуска требуется JDK 11<br />
 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-демо видео для v2:
-https://cloud.mail.ru/public/6JHE/48ffxAwij
+после запуска использовать URL:<br />
+http://localhost:8080/login<br />
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Схема БД:
-https://dbdesigner.page.link/AwfVBy1yfAadXZ6F8
-
-Дамп БД (для flyway):
-db/migration/V1_1_0__initial.sql
-
-Конфигурация flyway содержится в файле pom.xml в блоке plugins
-
-Миграция выполняется с помощью команды
-mvn clean flyway:migrate
+#### демо видео для v2: ####
+https://cloud.mail.ru/public/6JHE/48ffxAwij<br />
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+#### Схема БД ####:
+https://dbdesigner.page.link/AwfVBy1yfAadXZ6F8<br />
 
-Логины пароли
+Дамп БД (для flyway):<br />
+*db/migration/V1_1_0__initial.sql*<br />
 
-user1 user1
-user2 user2
-user3 user3
-admin admin
-moder moder
+Конфигурация flyway содержится в файле pom.xml в блоке plugins<br />
+
+Миграция выполняется с помощью команды<br />
+*mvn clean flyway:migrate*<br />
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Управление матрицей действий для каждой роли пользователя делается в таблице role в поле authorities. 
-Каждый бит, в зависимости от значения управляет следующими действиями:
+Логины | пароли
+-------|-------
+user1  | user1
+user2  | user2
+user3  | user3
+admin  | admin
+moder  | moder
 
-бит# действие
-0:   USER_BLOCKING
-1    USER_UNBLOCKING
-2    MODERATOR_SET 
-3    MODERATOR_DELETE
-4    MESSAGE_SEND
-5    MESSAGE_RECEIVE
-6    MESSAGE_DELETE
-7    PUBLIC_ROOM_CREATE
-8    PRIVATE_ROOM_CREATE
-9    USER_ADD
-10   USER_DELETE
-11   ROOM_RENAME
 
-Примеры
-Простой пользователь
-b001110110000=944
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Модератор
-b001111110011=1011
+#### Authorities ####
 
-Администратор
-b111111111111=4095
+Управление матрицей действий для каждой роли пользователя делается в таблице role в поле authorities. <br />
+Каждый бит, в зависимости от значения управляет следующими действиями:<br />
 
-Заблокированный
-b000000100000=32
+бит# | действие
+-----|----------------
+0:   | USER_BLOCKING
+1    | USER_UNBLOCKING
+2    | MODERATOR_SET
+3    | MODERATOR_DELETE
+4    | MESSAGE_SEND
+5    | MESSAGE_RECEIVE
+6    | MESSAGE_DELETE
+7    | PUBLIC_ROOM_CREATE
+8    | PRIVATE_ROOM_CREATE
+9    | USER_ADD
+10   | USER_DELETE
+11   | ROOM_RENAME
+
+#### Примеры ####
+Простой пользователь<br />
+b001110110000=944<br />
+
+Модератор<br />
+b001111110011=1011<br />
+
+Администратор<br />
+b111111111111=4095<br />
+
+Заблокированный<br />
+b000000100000=32<br />
