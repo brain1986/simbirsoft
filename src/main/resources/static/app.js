@@ -18,7 +18,7 @@ function roomCommonEvents() {
     stompClient.subscribe('/user/queue/rooms-common-events', function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
 
-        switch(data.eventType) {
+        switch (data.eventType) {
             case "room_list_full":
                 $("#room-buttons").empty();
                 $("#users-table").empty();
@@ -35,10 +35,10 @@ function roomCommonEvents() {
 }
 
 function roomConcrete(room) {
-    stompClient.subscribe('/topic/room-concrete/'+room.roomId, function (messageFromServer) {
+    stompClient.subscribe('/topic/room-concrete/' + room.roomId, function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
 
-        switch(data.eventType) {
+        switch (data.eventType) {
             case "new_message":
                 new_message(data.data);
                 break;
@@ -51,16 +51,16 @@ function roomConcrete(room) {
 
 function room_list_full(room) {
     $("#room-buttons").append(
-        "<input type='button' class='show-room-button' room_id='"+room.roomId+"' value='" + room.roomName + "' " +
+        "<input type='button' class='show-room-button' room_id='" + room.roomId + "' value='" + room.roomName + "' " +
         "style='background-color: #F9F9F9' />")
 
-    $(".show-room-button").on("click", function() {
+    $(".show-room-button").on("click", function () {
         selectRoom($(this).attr("room_id"));
     });
 
     appendRoom(room.roomId)
 
-    if(room.roomType == "DEFAULT_PUBLIC_ROOM") {
+    if (room.roomType == "DEFAULT_PUBLIC_ROOM") {
         selectRoom(room.roomId);
     }
 
@@ -70,7 +70,7 @@ function room_list_full(room) {
 }
 
 function messageSend(roomId) {
-    stompClient.send("/app/message-send/"+roomId, stompHeaders, JSON.stringify({'message': $("#message").val()}));
+    stompClient.send("/app/message-send/" + roomId, stompHeaders, JSON.stringify({'message': $("#message").val()}));
     $("#message").val("");
     $("#message").focus();
 }
@@ -79,28 +79,28 @@ function new_message(data) {
     message = "<b>" + data.chatUser.username + "</b> " + data.messageTime + "<br />"
         + "<i>" + data.message + "</i><br /><br />";
 
-    $(".room-block[room_id="+data.chatRoom.roomId+"] .messages-table").append("<tr><td>" + message + "</td></tr>");
+    $(".room-block[room_id=" + data.chatRoom.roomId + "] .messages-table").append("<tr><td>" + message + "</td></tr>");
 
-    scrollBlock = $(".room-block[room_id="+data.chatRoom.roomId+"] .my-custom-scrollbar");
+    scrollBlock = $(".room-block[room_id=" + data.chatRoom.roomId + "] .my-custom-scrollbar");
     scrollBlock.stop().animate({
         scrollTop: scrollBlock[0].scrollHeight
     }, 800);
 }
 
 function room_all_messages(data) {
-    for(i = 0; i < data.length; i++)
+    for (i = 0; i < data.length; i++)
         new_message(data[i]);
 }
 
 function showUsers(roomId, user) {
-    $(".room-block[room_id="+roomId+"] .users-table").append("<tr><td>" + user + "</td></tr>");
+    $(".room-block[room_id=" + roomId + "] .users-table").append("<tr><td>" + user + "</td></tr>");
 }
 
 function appendRoom(roomId) {
     $("#chat-block").append(
         $('#message-and-users-placeholder')
             .clone()
-            .attr('id', 'room-'+roomId)
+            .attr('id', 'room-' + roomId)
             .attr('class', 'room-block')
             .attr('room_id', roomId)
     );
@@ -108,9 +108,9 @@ function appendRoom(roomId) {
 
 function selectRoom(roomId) {
     $(".show-room-button").css({"background-color": "#F9F9F9"})
-    $(".show-room-button[room_id="+roomId+"]").css({"background-color": "#93b582"})
+    $(".show-room-button[room_id=" + roomId + "]").css({"background-color": "#93b582"})
     $(".room-block").hide();
-    $(".room-block[room_id="+roomId+"]").show();
+    $(".room-block[room_id=" + roomId + "]").show();
 }
 
 // function setConnected(connected) {
@@ -133,12 +133,14 @@ function disconnect(client) {
     console.log("Disconnected");
 }
 
-$(document).ready(function(){
+$(document).ready(function () {
     $("form").on('submit', function (e) {
         e.preventDefault();
     });
     clientWork();
 
     //$( "#disconnect" ).click(function() { disconnect(stompClient); });
-    $("#send-button").click(function() { messageSend($(".room-block:visible").attr("room_id")); });
+    $("#send-button").click(function () {
+        messageSend($(".room-block:visible").attr("room_id"));
+    });
 });

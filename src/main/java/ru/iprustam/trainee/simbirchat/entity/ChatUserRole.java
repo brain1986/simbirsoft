@@ -16,7 +16,7 @@ public class ChatUserRole {
     @ColumnDefault("0")
     private Short authorities;
 
-    @OneToMany(mappedBy="role")
+    @OneToMany(mappedBy = "role")
     private Set<ChatUser> users;
 
     public boolean hasAuthority(ChatAuthorities authority) {
@@ -24,28 +24,28 @@ public class ChatUserRole {
         return ((authorities >> bitOffset) & 0x1) == 0x1;
     }
 
-    public void setUsers(Set<ChatUser> users) {
-        this.users = users;
+    public Short getRoleId() {
+        return roleId;
     }
 
     public void setRoleId(Short roleId) {
         this.roleId = roleId;
     }
 
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public Short getRoleId() {
-        return roleId;
-    }
-
     public String getRoleName() {
         return roleName;
     }
 
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
     public Set<ChatUser> getUsers() {
         return users;
+    }
+
+    public void setUsers(Set<ChatUser> users) {
+        this.users = users;
     }
 
 

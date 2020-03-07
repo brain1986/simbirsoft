@@ -30,6 +30,10 @@ public class UserService implements UserDetailsService {
         this.simpUserRegistry = simpUserRegistry;
     }
 
+    public static UserDetails getLoggedUserDetails() {
+        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         ChatUser user = chatUserRepository.findByUsername(s);
@@ -44,10 +48,6 @@ public class UserService implements UserDetailsService {
     public Optional<ChatUser> authenticate(String username, String passwordHash) {
         Optional<ChatUser> chatUser = Optional.ofNullable(chatUserRepository.findByUsernameAndPassword(username, passwordHash));
         return chatUser;
-    }
-
-    public static UserDetails getLoggedUserDetails() {
-        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
     public void getActiveWebsocketUsers() {

@@ -17,12 +17,12 @@ public class ChatRoom {
     @ManyToMany
     @JoinTable(
             name = "room_user",
-            joinColumns = { @JoinColumn(name = "room_id") },
-            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+            joinColumns = {@JoinColumn(name = "room_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
     private Set<ChatUser> users;
 
-    @OneToMany(mappedBy="chatRoom", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
     private Set<ChatMessage> messages;
 
     public String getRoomName() {

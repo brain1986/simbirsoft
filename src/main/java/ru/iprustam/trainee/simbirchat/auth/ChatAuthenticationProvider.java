@@ -42,15 +42,15 @@ public class ChatAuthenticationProvider implements AuthenticationProvider {
         ChatUser user = (ChatUser) userService.loadUserByUsername(username);
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         boolean passwordsMatch = encoder.matches(password, user.getPassword());
-        if(!passwordsMatch)
+        if (!passwordsMatch)
             throw new UsernameNotFoundException("Passwords don't match");
 
         ChatUserRole role = user.getRole();
         // Add role
-        StringBuilder rolesAndAuthorities = new StringBuilder(role.getRoleName()+",");
+        StringBuilder rolesAndAuthorities = new StringBuilder(role.getRoleName() + ",");
         // Add authorities
         ChatAuthorities[] allAuthorities = ChatAuthorities.values();
-        Arrays.stream(allAuthorities).filter(a->role.hasAuthority(a)).forEach(a->rolesAndAuthorities.append(a+","));
+        Arrays.stream(allAuthorities).filter(a -> role.hasAuthority(a)).forEach(a -> rolesAndAuthorities.append(a + ","));
 
         List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(
                 rolesAndAuthorities.toString());
