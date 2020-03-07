@@ -24,8 +24,4 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "ORDER BY room_id ASC",
             nativeQuery = true)
     List<ChatRoom> findByUserId(Long userId);
-//    void addRoom(Room room);
-//    void deleteRoom(Integer roomId);
-//    Room findRoomById(Integer roomId);
-//    Collection<Room> findAllRooms();
 }

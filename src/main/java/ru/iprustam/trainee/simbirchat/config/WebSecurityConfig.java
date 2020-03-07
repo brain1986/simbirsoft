@@ -35,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            .formLogin()
+                .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
@@ -43,11 +43,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/chat")
                 .permitAll()
                 .and()
-            .logout()
+                .logout()
                 .logoutSuccessUrl("/login")
                 .permitAll()
                 .and()
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers("/chat").hasAnyRole("USER", "ADMIN", "MODERATOR")
                 .antMatchers("/**", "/webjars").permitAll()
                 .requestMatchers(EndpointRequest.toAnyEndpoint()).hasAnyRole("USER", "ADMIN", "MODERATOR")

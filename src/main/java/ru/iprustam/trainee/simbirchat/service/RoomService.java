@@ -24,6 +24,7 @@ public class RoomService {
 
     /**
      * Возвращает комнаты по заданному типу комнаты
+     *
      * @param chatRoomTypes
      * @return
      */

@@ -43,14 +43,14 @@ public class WsChatService {
         ChatUser chatUser = (ChatUser) UserService.getLoggedUserDetails();
 
         ChatRoom defaultRoom = getDefaultRoom();
-        if(defaultRoom != null) {
+        if (defaultRoom != null) {
             if (!isUserInRoom(chatUser, defaultRoom)) {
                 roomService.addUserToRoom(defaultRoom, chatUser);
             }
         }
 
         List<ChatRoom> chatRooms = roomService.getAllUserRooms(chatUser);
-        for(var room : chatRooms) {
+        for (var room : chatRooms) {
             room.setUsers(new HashSet<>(userService.findUsers(room.getRoomId())));
         }
 
@@ -60,9 +60,9 @@ public class WsChatService {
                 ChatTransport.getPacket("room_list_full", chatRooms));
     }
 
-    private ChatRoom getDefaultRoom()  {
+    private ChatRoom getDefaultRoom() {
         List<ChatRoom> rooms = roomService.findRooms(ChatRoomTypes.DEFAULT_PUBLIC_ROOM);
-        if(rooms.size() != 0) {
+        if (rooms.size() != 0) {
             return rooms.get(0);
         }
 
@@ -72,32 +72,34 @@ public class WsChatService {
     private boolean isUserInRoom(ChatUser chatUser, ChatRoom chatRoom) {
         return userService
                 .findUsers(chatRoom.getRoomId())
-                .stream().anyMatch(u->u.getUserId() == chatUser.getUserId());
+                .stream().anyMatch(u -> u.getUserId() == chatUser.getUserId());
 
     }
 
     /**
      * Проверяет, имеет ли заданный пользователь доступ к заданной комнате
+     *
      * @param roomId
      * @param chatUser
      */
     public void tryAccessRoom(Long roomId, ChatUser chatUser) {
         List<ChatRoom> chatRooms = roomService.getAllUserRooms(chatUser);
-        for(var room : chatRooms) {
+        for (var room : chatRooms) {
             room.setUsers(new HashSet<>(userService.findUsers(room.getRoomId())));
         }
 
         boolean hasUser = chatRooms.stream()
-                .filter(r->r.getRoomId() == roomId)
-                .flatMap(s->s.getUsers().stream())
-                .anyMatch(u->u.getUserId() == chatUser.getUserId());
+                .filter(r -> r.getRoomId() == roomId)
+                .flatMap(s -> s.getUsers().stream())
+                .anyMatch(u -> u.getUserId() == chatUser.getUserId());
 
-        if(!hasUser)
-            throw new IllegalArgumentException("User is not in the roomId="+roomId);
+        if (!hasUser)
+            throw new IllegalArgumentException("User is not in the roomId=" + roomId);
     }
 
     /**
      * Принимает сообщение от пользователя, записывает в базу и транслирует обратно в вебсокет
+     *
      * @param message
      * @param roomId
      */
@@ -114,12 +116,13 @@ public class WsChatService {
         messageService.save(message);
 
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/"+roomId,
+                "/topic/room-concrete/" + roomId,
                 ChatTransport.getPacket("new_message", message));
     }
 
     /**
      * Отправляет сообщения из БД пользователям при SUBSCRIBE к вебсокету
+     *
      * @param roomId
      */
     @PreAuthorize("hasAuthority('MESSAGE_RECEIVE')")
@@ -130,7 +133,7 @@ public class WsChatService {
         List<ChatMessage> messages = messageService.findMessages(chatRoom);
 
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/"+roomId,
+                "/topic/room-concrete/" + roomId,
                 ChatTransport.getPacketM("room_all_messages", messages));
     }
 }

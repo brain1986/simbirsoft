@@ -21,11 +21,11 @@ public class ChatUser implements UserDetails {
     @ManyToMany(mappedBy = "users")
     private Set<ChatRoom> rooms;
 
-    @OneToMany(mappedBy="chatUser", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "chatUser", cascade = CascadeType.REMOVE)
     private Set<ChatMessage> messages;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="role_id", nullable=false)
+    @JoinColumn(name = "role_id", nullable = false)
     private ChatUserRole role;
 
     @PreRemove
@@ -54,32 +54,24 @@ public class ChatUser implements UserDetails {
         return rooms;
     }
 
-    public Set<ChatMessage> getMessages() {
-        return messages;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public void setRooms(Set<ChatRoom> rooms) {
         this.rooms = rooms;
+    }
+
+    public Set<ChatMessage> getMessages() {
+        return messages;
     }
 
     public void setMessages(Set<ChatMessage> messages) {
         this.messages = messages;
     }
 
-    public void setRole(ChatUserRole role) {
-        this.role = role;
-    }
-
     public ChatUserRole getRole() {
         return role;
+    }
+
+    public void setRole(ChatUserRole role) {
+        this.role = role;
     }
 
     public Long getUserId() {
@@ -95,9 +87,17 @@ public class ChatUser implements UserDetails {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override

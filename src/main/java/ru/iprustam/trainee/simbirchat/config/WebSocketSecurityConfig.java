@@ -9,7 +9,7 @@ import static org.springframework.messaging.simp.SimpMessageType.SUBSCRIBE;
 
 @Configuration
 public class WebSocketSecurityConfig
-            extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+        extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {

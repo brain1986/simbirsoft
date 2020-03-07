@@ -13,7 +13,7 @@ public class ChatTransport {
                 room -> {
                     room.setMessages(null);
                     room.getUsers().forEach(
-                            user->{
+                            user -> {
                                 user.setPassword("");
                                 user.setMessages(null);
                                 user.setRooms(null);
@@ -29,7 +29,7 @@ public class ChatTransport {
     }
 
     public static Packet<List<ChatMessage>> getPacketM(String eventName, List<ChatMessage> data) {
-        List<ChatMessage> messages = data.stream().map(m->messageClean(m)).collect(Collectors.toList());
+        List<ChatMessage> messages = data.stream().map(m -> messageClean(m)).collect(Collectors.toList());
         return new Packet(eventName, messages);
     }
 
