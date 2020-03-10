@@ -21,6 +21,7 @@ CREATE TABLE message (
 
 CREATE TABLE room (
     room_id BIGSERIAL NOT NULL,
+    owner_user_id bigint NOT NULL,
     room_name character varying(255),
     room_type integer
 );
@@ -53,7 +54,10 @@ ALTER TABLE ONLY room_user
     
 ALTER TABLE ONLY usr
     ADD CONSTRAINT usr_pkey PRIMARY KEY (user_id);
-    
+
+ALTER TABLE ONLY room
+    ADD CONSTRAINT fk96asdasdcaweeewussdkfjkds FOREIGN KEY (owner_user_id) REFERENCES usr(user_id);
+
 ALTER TABLE ONLY room_user
     ADD CONSTRAINT fk3cyu6d3buptgjo9g8qcvhothn FOREIGN KEY (user_id) REFERENCES usr(user_id);
 
@@ -77,12 +81,6 @@ INSERT INTO role (role_id, role_name, authorities) VALUES
   (4, 'ROLE_BOT', 4095),
   (5, 'ROLE_BLOCKED', 32);
 
-INSERT INTO room (room_id, room_type, room_name) VALUES
-  (1, 0, 'Общая комната'), 
-  (2, 1, 'Комната 2'),
-  (3, 2, 'Комната 3'),
-  (4, 3, 'Комната 4');
-  
 INSERT INTO usr (user_id, password, username, role_id, blocked) VALUES
   (1, '$2a$10$hn03kGjb2fJ6Hc2Zq9JIn.JENytzfs9zlomioihi968O6Sx0.UtES', 'user1', 3, false), 
   (2, '$2a$10$CPtrB9BOnjo0ePyIodCfmuEubmbdvrYH69wP/bC0DhEaXgAAGJ3/G', 'user2', 3, false),
@@ -90,6 +88,11 @@ INSERT INTO usr (user_id, password, username, role_id, blocked) VALUES
   (4, '$2a$10$gTq2bMoapI8psU75H9c1.OUOOAc9zeMEBgwE3Wz5OGqnQcgRBlu/S', 'moder', 2, false),
   (5, '$2a$10$Ai6Zt3J080o4BoUzjOgF/uJzaDwT/EODsOX./2aRe4CsQZh5ixvQy', 'bot', 4, false);
 
+INSERT INTO room (room_id, owner_user_id, room_type, room_name) VALUES
+(1, 3, 0, 'Общая комната'),
+(2, 1, 1, 'Комната 2'),
+(3, 1, 2, 'Комната 3'),
+(4, 2, 3, 'Комната 4');
   
 INSERT INTO message (message, message_time, user_id, room_id) VALUES
   ('Hello from user1', '2020-03-03T15:30:00+03:00', 1, 1), 

@@ -14,6 +14,10 @@ public class ChatRoom {
     private ChatRoomTypes roomType;
     private String roomName;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_user_id", nullable = false)
+    private ChatUser owner;
+
     @ManyToMany
     @JoinTable(
             name = "room_user",

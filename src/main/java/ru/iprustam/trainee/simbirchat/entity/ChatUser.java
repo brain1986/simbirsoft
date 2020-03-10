@@ -1,11 +1,14 @@
 package ru.iprustam.trainee.simbirchat.entity;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.iprustam.trainee.simbirchat.util.role.ChatAuthorities;
 
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,6 +31,9 @@ public class ChatUser implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private ChatUserRole role;
 
+    @OneToMany(mappedBy = "owner")
+    private Set<ChatRoom> roomsWhichOwn;
+
     @PreRemove
     private void removeUser() {
         for (ChatRoom r : rooms) {
@@ -37,8 +43,15 @@ public class ChatUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add((GrantedAuthority) () -> role.getRoleName());
+        // Add role
+        StringBuilder rolesAndAuthorities = new StringBuilder(role.getRoleName() + ",");
+        // Add authorities
+        ChatAuthorities[] allAuthorities = ChatAuthorities.values();
+        Arrays.stream(allAuthorities).filter(a -> role.hasAuthority(a)).forEach(a -> rolesAndAuthorities.append(a + ","));
+
+        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(
+                rolesAndAuthorities.toString());
+
         return authorities;
     }
 
