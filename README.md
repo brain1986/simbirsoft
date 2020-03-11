@@ -15,13 +15,7 @@ https://cloud.mail.ru/public/6JHE/48ffxAwij<br />
 https://dbdesigner.page.link/AwfVBy1yfAadXZ6F8<br />
 
 Дамп БД (для flyway):<br />
-*db/migration/V1_1_0__initial.sql*<br />
-
-Конфигурация flyway содержится в файле pom.xml в блоке plugins<br />
-
-Миграция выполняется с помощью команды<br />
-*mvn clean flyway:migrate*<br />
-
+*src/main/resources/db/migration/V1_1_0__initial.sql*<br />
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
