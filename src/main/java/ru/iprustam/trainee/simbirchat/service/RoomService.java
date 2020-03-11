@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.repository.ChatRoomRepository;
-import ru.iprustam.trainee.simbirchat.util.room.ChatRoomTypes;
+import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.List;
 
@@ -25,19 +25,28 @@ public class RoomService {
     /**
      * Возвращает комнаты по заданному типу комнаты
      *
-     * @param chatRoomTypes
+     * @param chatRoomType
      * @return
      */
-    public List<ChatRoom> findRooms(ChatRoomTypes chatRoomTypes) {
-        List<ChatRoom> rooms = chatRoomRepository.findByRoomType(chatRoomTypes);
-        return rooms;
+    public List<ChatRoom> findRooms(ChatRoomType chatRoomType) {
+        return chatRoomRepository.findByRoomType(chatRoomType);
     }
 
     public void addUserToRoom(ChatRoom chatRoom, ChatUser chatUser) {
         chatRoomRepository.addRoomUser(chatRoom.getRoomId(), chatUser.getUserId());
     }
 
-    public List<ChatRoom> getAllUserRooms(ChatUser chatUser) {
+    /**
+     * Получить все комнаты, где состоит заданный юзер
+     *
+     * @param chatUser
+     * @return
+     */
+    public List<ChatRoom> getRoomsWhereUserIn(ChatUser chatUser) {
         return chatRoomRepository.findByUserId(chatUser.getUserId());
+    }
+
+    public void save(ChatRoom chatRoom) {
+        chatRoomRepository.save(chatRoom);
     }
 }

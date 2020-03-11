@@ -79,9 +79,9 @@ function new_message(data) {
     message = "<b>" + data.chatUser.username + "</b> " + data.messageTime + "<br />"
         + "<i>" + data.message + "</i><br /><br />";
 
-    $(".room-block[room_id=" + data.chatRoom.roomId + "] .messages-table").append("<tr><td>" + message + "</td></tr>");
+    $(".room-block[room_id=" + data.roomId + "] .messages-table").append("<tr><td>" + message + "</td></tr>");
 
-    scrollBlock = $(".room-block[room_id=" + data.chatRoom.roomId + "] .my-custom-scrollbar");
+    scrollBlock = $(".room-block[room_id=" + data.roomId + "] .my-custom-scrollbar");
     scrollBlock.stop().animate({
         scrollTop: scrollBlock[0].scrollHeight
     }, 800);

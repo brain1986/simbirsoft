@@ -1,8 +1,10 @@
-package ru.iprustam.trainee.simbirchat.controller.dto;
+package ru.iprustam.trainee.simbirchat.dto;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import ru.iprustam.trainee.simbirchat.controller.dto.model.ChatRoomDto;
+import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
+import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
+import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 
 import java.util.List;
@@ -16,20 +18,37 @@ public class DtoTransport {
         this.modelMapper = modelMapper;
     }
 
-    public DtoPacket entityToDto(String eventType, ChatRoom entity) {
-        ChatRoomDto dto = modelMapper.map(entity, ChatRoomDto.class);
-        //dto.setRoomId(entity.getRoomId());
-        //dto.setRoomName(entity.getRoomName());
+    public DtoPacket chatRoomToDto(String eventType, ChatRoom entity) {
+        ChatRoomDto dto = getRoomDto(entity);
         return new DtoPacket(eventType, dto);
     }
 
-    public DtoPacket entityToDto(String eventType, List<ChatRoom> entity) {
-        List<ChatRoomDto> dtoList = entity.stream().map(e -> {
-            ChatRoomDto dto = modelMapper.map(e, ChatRoomDto.class);
-            return dto;
-        }).collect(Collectors.toList());
+    public DtoPacket chatRoomsToDto(String eventType, List<ChatRoom> entity) {
+        List<ChatRoomDto> dtoList = entity.stream()
+                .map(e -> getRoomDto(e))
+                .collect(Collectors.toList());
         return new DtoPacket(eventType, dtoList);
     }
 
+    private ChatRoomDto getRoomDto(ChatRoom chatRoom) {
+        ChatRoomDto dto = modelMapper.map(chatRoom, ChatRoomDto.class);
+        return dto;
+    }
 
+    public DtoPacket chatMessageToDto(String eventType, ChatMessage entity) {
+        ChatMessageDto dto = getMessageDto(entity);
+        return new DtoPacket(eventType, dto);
+    }
+
+    public DtoPacket chatMessagesToDto(String eventType, List<ChatMessage> entity) {
+        List<ChatMessageDto> dtoList = entity.stream()
+                .map(e -> getMessageDto(e))
+                .collect(Collectors.toList());
+        return new DtoPacket(eventType, dtoList);
+    }
+
+    private ChatMessageDto getMessageDto(ChatMessage chatMessage) {
+        ChatMessageDto dto = modelMapper.map(chatMessage, ChatMessageDto.class);
+        return dto;
+    }
 }

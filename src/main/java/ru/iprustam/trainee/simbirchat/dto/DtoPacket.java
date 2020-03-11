@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.controller.dto;
+package ru.iprustam.trainee.simbirchat.dto;
 
 public class DtoPacket<T> {
     private T data;

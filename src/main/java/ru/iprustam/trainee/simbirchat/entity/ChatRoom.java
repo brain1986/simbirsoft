@@ -1,6 +1,6 @@
 package ru.iprustam.trainee.simbirchat.entity;
 
-import ru.iprustam.trainee.simbirchat.util.room.ChatRoomTypes;
+import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -11,7 +11,7 @@ public class ChatRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
-    private ChatRoomTypes roomType;
+    private ChatRoomType roomType;
     private String roomName;
 
     @ManyToOne
@@ -29,10 +29,6 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
     private Set<ChatMessage> messages;
 
-    public String getRoomName() {
-        return roomName;
-    }
-
     public Long getRoomId() {
         return roomId;
     }
@@ -41,11 +37,11 @@ public class ChatRoom {
         this.roomId = roomId;
     }
 
-    public ChatRoomTypes getRoomType() {
+    public ChatRoomType getRoomType() {
         return roomType;
     }
 
-    public void setRoomType(ChatRoomTypes roomType) {
+    public void setRoomType(ChatRoomType roomType) {
         this.roomType = roomType;
     }
 
@@ -65,4 +61,19 @@ public class ChatRoom {
         this.messages = messages;
     }
 
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
+    public ChatUser getOwner() {
+        return owner;
+    }
+
+    public void setOwner(ChatUser owner) {
+        this.owner = owner;
+    }
 }
