@@ -1,11 +1,10 @@
-package ru.iprustam.trainee.simbirchat.controller.transport;
+package ru.iprustam.trainee.simbirchat.controller.dto;
 
-public class Packet<T> {
-
+public class DtoPacket<T> {
     private T data;
     private String eventType;
 
-    public Packet(String eventType, T data) {
+    public DtoPacket(String eventType, T data) {
         this.eventType = eventType;
         this.data = data;
     }
