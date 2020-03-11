@@ -3,7 +3,7 @@ package ru.iprustam.trainee.simbirchat.entity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.iprustam.trainee.simbirchat.util.role.ChatAuthorities;
+import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -46,8 +46,10 @@ public class ChatUser implements UserDetails {
         // Add role
         StringBuilder rolesAndAuthorities = new StringBuilder(role.getRoleName() + ",");
         // Add authorities
-        ChatAuthorities[] allAuthorities = ChatAuthorities.values();
-        Arrays.stream(allAuthorities).filter(a -> role.hasAuthority(a)).forEach(a -> rolesAndAuthorities.append(a + ","));
+        ChatAuthority[] allAuthorities = ChatAuthority.values();
+        Arrays.stream(allAuthorities)
+                .filter(a -> (role.getAuthorities() >> a.ordinal() & 0x1) == 0x1)
+                .forEach(a -> rolesAndAuthorities.append(a + ","));
 
         List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(
                 rolesAndAuthorities.toString());
@@ -93,6 +95,14 @@ public class ChatUser implements UserDetails {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Set<ChatRoom> getRoomsWhichOwn() {
+        return roomsWhichOwn;
+    }
+
+    public void setRoomsWhichOwn(Set<ChatRoom> roomsWhichOwn) {
+        this.roomsWhichOwn = roomsWhichOwn;
     }
 
     @Override

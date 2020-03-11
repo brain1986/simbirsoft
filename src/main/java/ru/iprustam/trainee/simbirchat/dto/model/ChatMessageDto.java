@@ -2,11 +2,11 @@ package ru.iprustam.trainee.simbirchat.dto.model;
 
 import java.time.ZonedDateTime;
 
-public class MessagesDto {
+public class ChatMessageDto {
     private Long messageId;
     private String message;
     private ZonedDateTime messageTime;
-    private ChatRoomDto chatRoom;
+    private Long roomId;
     private ChatUserDto chatUser;
 
     public Long getMessageId() {
@@ -33,13 +33,12 @@ public class MessagesDto {
         this.messageTime = messageTime;
     }
 
-
-    public ChatRoomDto getChatRoom() {
-        return chatRoom;
+    public Long getRoomId() {
+        return roomId;
     }
 
-    public void setChatRoom(ChatRoomDto chatRoom) {
-        this.chatRoom = chatRoom;
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
 
     public ChatUserDto getChatUser() {

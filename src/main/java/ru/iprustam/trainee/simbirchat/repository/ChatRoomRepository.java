@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
-import ru.iprustam.trainee.simbirchat.util.room.ChatRoomTypes;
+import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.List;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    List<ChatRoom> findByRoomType(ChatRoomTypes roomType);
+    List<ChatRoom> findByRoomType(ChatRoomType roomType);
 
     @Modifying
     @Transactional

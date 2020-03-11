@@ -111,3 +111,8 @@ INSERT INTO room_user (room_id, user_id) VALUES
   (3, 1),
   (3, 4);
 
+
+SELECT setval('message_message_id_seq', (SELECT MAX(message_id) from message));
+SELECT setval('role_role_id_seq', (SELECT MAX(role_id) from role));
+SELECT setval('room_room_id_seq', (SELECT MAX(room_id) from room));
+SELECT setval('usr_user_id_seq', (SELECT MAX(user_id) from usr));

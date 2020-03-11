@@ -1,7 +1,6 @@
 package ru.iprustam.trainee.simbirchat.entity;
 
 import org.hibernate.annotations.ColumnDefault;
-import ru.iprustam.trainee.simbirchat.util.role.ChatAuthorities;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -18,11 +17,6 @@ public class ChatUserRole {
 
     @OneToMany(mappedBy = "role")
     private Set<ChatUser> users;
-
-    public boolean hasAuthority(ChatAuthorities authority) {
-        int bitOffset = authority.ordinal();
-        return ((authorities >> bitOffset) & 0x1) == 0x1;
-    }
 
     public Short getRoleId() {
         return roleId;
@@ -48,5 +42,11 @@ public class ChatUserRole {
         this.users = users;
     }
 
+    public Short getAuthorities() {
+        return authorities;
+    }
 
+    public void setAuthorities(Short authorities) {
+        this.authorities = authorities;
+    }
 }
