@@ -6,7 +6,6 @@ function clientWork() {
     var socket = new SockJS('/ws-chat');
     stompClient = Stomp.over(socket);
     stompClient.connect(stompHeaders, function (frame) {
-        //setConnected(true);
         console.log('Connected: ' + frame);
 
         //Common events channel subscription and handling
@@ -52,13 +51,13 @@ function roomConcrete(room) {
 function room_list_full(room) {
     $("#room-buttons").append(
         "<input type='button' class='show-room-button' room_id='" + room.roomId + "' value='" + room.roomName + "' " +
-        "style='background-color: #F9F9F9' />")
+        "style='background-color: #F9F9F9' />");
 
     $(".show-room-button").on("click", function () {
         selectRoom($(this).attr("room_id"));
     });
 
-    appendRoom(room.roomId)
+    appendRoom(room.roomId);
 
     if (room.roomType == "DEFAULT_PUBLIC_ROOM") {
         selectRoom(room.roomId);
@@ -107,29 +106,16 @@ function appendRoom(roomId) {
 }
 
 function selectRoom(roomId) {
-    $(".show-room-button").css({"background-color": "#F9F9F9"})
-    $(".show-room-button[room_id=" + roomId + "]").css({"background-color": "#93b582"})
+    $(".show-room-button").css({"background-color": "#F9F9F9"});
+    $(".show-room-button[room_id=" + roomId + "]").css({"background-color": "#93b582"});
     $(".room-block").hide();
     $(".room-block[room_id=" + roomId + "]").show();
 }
-
-// function setConnected(connected) {
-//     $("#connect").prop("disabled", connected);
-//     $("#disconnect").prop("disabled", !connected);
-//     if (connected) {
-//         $("#messages-container").show();
-//     }
-//     else {
-//         $("#messages-container").hide();
-//     }
-//     $("#messages").html("");
-// }
 
 function disconnect(client) {
     if (client !== null) {
         client.disconnect();
     }
-    //setConnected(false);
     console.log("Disconnected");
 }
 
@@ -139,7 +125,6 @@ $(document).ready(function () {
     });
     clientWork();
 
-    //$( "#disconnect" ).click(function() { disconnect(stompClient); });
     $("#send-button").click(function () {
         messageSend($(".room-block:visible").attr("room_id"));
     });

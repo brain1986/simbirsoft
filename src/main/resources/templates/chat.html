@@ -18,7 +18,7 @@
 <body>
 <noscript><h2 style="color: #ff0000">Javascript is not supported</h2></noscript>
 
-<div id="main-content" class="container">
+<div class="container" id="main-content">
     <div class="row">
         <h3 th:text="${username}"></h3>
         <div id="welcome-user"></div>
@@ -59,11 +59,11 @@
     </div>
     <div class="row">
         <div class="col-md-4">
-            <textarea name="message" id="message" class="form-control" required autofocus
-                      placeholder="Напишите что-нибудь..."></textarea>
+            <textarea autofocus class="form-control" id="message" name="message" placeholder="Напишите что-нибудь..."
+                      required></textarea>
         </div>
         <div class="col-md-2">
-            <input type="button" class="btn btn-lg btn-primary btn-block" id="send-button" value="Отправить"/>
+            <input class="btn btn-lg btn-primary btn-block" id="send-button" type="button" value="Отправить"/>
         </div>
     </div>
 </div>
