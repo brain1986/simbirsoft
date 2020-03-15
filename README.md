@@ -49,6 +49,9 @@ moder  | moder
 9    | USER_ADD
 10   | USER_DELETE
 11   | ROOM_RENAME
+12   | ROOM_DELETE
+13   | ROOM_CONNECT
+14   | USER_RENAME
 
 #### Примеры ####
 Простой пользователь<br />

@@ -16,9 +16,8 @@ function clientWork() {
 function roomCommonEvents() {
     stompClient.subscribe('/user/queue/rooms-common-events', function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
-
         switch (data.eventType) {
-            case "room_list_full":
+            case "room_list_full": {
                 $("#room-buttons").empty();
                 $("#users-table").empty();
                 for (i = 0; i < data.data.length; i++) {
@@ -28,7 +27,8 @@ function roomCommonEvents() {
                     //Concrete room channel subscription and handling
                     roomConcrete(room);
                 }
-                break;
+            }
+            break;
         }
     }, stompHeaders);
 }
@@ -36,13 +36,15 @@ function roomCommonEvents() {
 function roomConcrete(room) {
     stompClient.subscribe('/topic/room-concrete/' + room.roomId, function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
-
         switch (data.eventType) {
             case "new_message":
                 new_message(data.data);
                 break;
             case "room_all_messages":
                 room_all_messages(data.data);
+                break;
+            case "system_command":
+                new_message(data.data);
                 break;
         }
     }, stompHeaders);
@@ -69,7 +71,15 @@ function room_list_full(room) {
 }
 
 function messageSend(roomId) {
-    stompClient.send("/app/message-send/" + roomId, stompHeaders, JSON.stringify({'message': $("#message").val()}));
+
+    message = $("#message").val();
+
+    if (message.length >= 2)
+        if (message.substring(0, 2) != "//")
+            message = "//msg -m {" + message + "}";
+
+    stompClient.send("/app/message-send/" + roomId, stompHeaders,
+        JSON.stringify({'message': message}));
     $("#message").val("");
     $("#message").focus();
 }
@@ -110,13 +120,6 @@ function selectRoom(roomId) {
     $(".show-room-button[room_id=" + roomId + "]").css({"background-color": "#93b582"});
     $(".room-block").hide();
     $(".room-block[room_id=" + roomId + "]").show();
-}
-
-function disconnect(client) {
-    if (client !== null) {
-        client.disconnect();
-    }
-    console.log("Disconnected");
 }
 
 $(document).ready(function () {

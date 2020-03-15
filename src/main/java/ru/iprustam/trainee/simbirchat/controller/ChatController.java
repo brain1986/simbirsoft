@@ -1,10 +1,10 @@
 package ru.iprustam.trainee.simbirchat.controller;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 
 @Controller
 public class ChatController {
@@ -16,11 +16,7 @@ public class ChatController {
 
     @GetMapping("/chat")
     public String chatPage(Model model) {
-        model.addAttribute("username",
-                ((UserDetails) SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getPrincipal())
-                        .getUsername());
+        model.addAttribute("username", ((UserDetails) UserUtils.getCurrentPrincipal()).getUsername());
         return "chat";
     }
 
