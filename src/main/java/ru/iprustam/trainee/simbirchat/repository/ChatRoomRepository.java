@@ -18,16 +18,20 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     @Transactional
     Long deleteByRoomNameIgnoreCase(String roomName);
 
-
-
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "INSERT INTO room_user(room_id, user_id) VALUES (:roomId, :userId)")
     void addRoomUser(Long roomId, Long userId);
 
     @Transactional
-    @Query(value = "SELECT room.* FROM room, room_user WHERE room.room_id=room_user.room_id AND room_user.user_id=:userId " +
+    @Query(value = "SELECT room.*, room_user.block_until FROM room, room_user " +
+            "WHERE room.room_id=room_user.room_id AND room_user.user_id=:userId " +
             "ORDER BY room_id ASC",
             nativeQuery = true)
     List<ChatRoom> findByUserId(Long userId);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM room_user WHERE room_id=:roomId AND user_id=:userId")
+    void deleteUserFromRoom(Long roomId, Long userId);
 }

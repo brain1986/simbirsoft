@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
 import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
 import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
@@ -15,7 +16,6 @@ import ru.iprustam.trainee.simbirchat.service.wscom.handler.MessageHandler;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -73,13 +73,11 @@ public class WsChatService {
         }
 
         List<ChatRoom> chatRooms = roomService.getRoomsWhereUserIn(chatUser);
-        for (var room : chatRooms) {
-            room.setUsers(new HashSet<>(userService.findUsers(room.getRoomId())));
-        }
 
+        DtoPacket packet = dtoTransport.entitiesToDtoList("room_list_full", chatRooms, ChatRoomDto.class);
         messagingTemplate.convertAndSend(
                 "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.entitiesToDtoList("room_list_full", chatRooms, ChatRoomDto.class));
+                packet);
     }
 
     /**

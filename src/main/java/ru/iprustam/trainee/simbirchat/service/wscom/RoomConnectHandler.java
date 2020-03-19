@@ -5,12 +5,14 @@ import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
 import ru.iprustam.trainee.simbirchat.dto.model.ChatUserDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
+import ru.iprustam.trainee.simbirchat.entity.RoomUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -47,10 +49,7 @@ public class RoomConnectHandler extends BaseMessageHandler {
         if(chatRoom.get().getRoomType() == ChatRoomType.PUBLIC_ROOM)
             return true;
 
-        if(chatRoom.get().getOwner().getUserId() != currentUser.getUserId())
-            return false;
-
-        if(chatRoom.get().getRoomType() == ChatRoomType.BOT_ROOM)
+        if(chatRoom.get().getOwner().getUserId() == currentUser.getUserId())
             return true;
 
         return false;
@@ -63,7 +62,7 @@ public class RoomConnectHandler extends BaseMessageHandler {
         if(chatCommand.getParam("l") != null)
             chatUser = userService.findUser(chatCommand.getParam("l"));
         else
-            chatUser = UserUtils.getCurrentPrincipal();
+            chatUser = userService.findUser(UserUtils.getCurrentPrincipal().getUsername());
 
         Optional<ChatRoom> chatRoomOptional = roomService.findRoom(roomName);
         if (chatRoomOptional.isEmpty())
@@ -71,9 +70,17 @@ public class RoomConnectHandler extends BaseMessageHandler {
 
         ChatRoom chatRoom = chatRoomOptional.get();
         if (!userService.isUserInRoom(chatUser, chatRoom.getRoomId()))
-            roomService.addUserToRoom(chatRoom, chatUser);
-        else
+            chatRoom = roomService.addUserToRoom(chatRoom, chatUser);
+        else {
+            // Проверить не заблокирован ли юзер
+            Optional<RoomUser> roomUser = chatUser.getRoomsUsers().stream()
+                    .filter(ru-> ru.getUser().getUserId() == chatUser.getUserId())
+                    .filter(ru->ru.getBlockUntil().isAfter(ZonedDateTime.now()))
+                    .findAny();
+            if(roomUser.isPresent())
+                throw new Exception("This user blocked until " + roomUser.get().getBlockUntil());
             throw new Exception("This user is already in the room ");
+        }
 
         // Добавляем к списку юзеров комнаты
         DtoPacket packet = dtoTransport.entitiesToDtoMap("room_connect",

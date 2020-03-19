@@ -16,7 +16,8 @@ function clientWork() {
 }
 
 function publicEvents() {
-    stompClient.subscribe('/topic/events-for-all', function (messageFromServer) {}, stompHeaders);
+    stompClient.subscribe('/topic/events-for-all', function (messageFromServer) {
+    }, stompHeaders);
     userCommonEvents();
 }
 
@@ -72,6 +73,9 @@ function roomConcreteEvents(room) {
             case "user_rename":
                 user_rename(data.data);
                 break;
+            case "room_disconnect":
+                room_disconnect(data.data);
+                break;
         }
     }, stompHeaders);
 }
@@ -91,8 +95,8 @@ function room_list_full(room) {
         selectRoom(room.roomId);
     }
 
-    for (k = 0; k < room.users.length; k++) {
-        addUser(room.roomId, room.users[k]);
+    for (k = 0; k < room.roomsUsers.length; k++) {
+        addUser(room.roomId, room.roomsUsers[k].user);
     }
 }
 
@@ -146,16 +150,30 @@ function room_connect(data) {
     addUser(data.roomId, data.chatUser);
 }
 
+function room_disconnect(data) {
+    removeUser(data.roomId, data.chatUser);
+    if (data.chatUser.userId == userId) {
+        $("#room-buttons .show-room-button[room_id='" + data.roomId + "']").remove();
+        $("#room-" + data.roomId).remove();
+        $("#room-buttons .show-room-button").first().click();
+        location.reload();
+    }
+}
+
 function user_rename(data) {
     $("*[user_id='" + data.userId + "']").html(data.new_username);
-    if(data.userId == userId) {
+    if (data.userId == userId) {
         location.reload(); //не разобрался как перезапустить клиента нормально
     }
 }
 
 function addUser(roomId, user) {
-    $(".room-block[room_id=" + roomId + "] .users-table").append("<tr id='user-cell'><td user_id='" + user.userId
-        + "'>" + user.username + "</td></tr>");
+    $(".room-block[room_id=" + roomId + "] .users-table").append("<tr id='user-cell' tr_userid='" + user.userId
+        + "'><td user_id='" + user.userId + "'>" + user.username + "</td></tr>");
+}
+
+function removeUser(roomId, user) {
+    $(".room-block[room_id=" + roomId + "] .users-table tr[tr_userid='" + user.userId + "']").remove();
 }
 
 function appendRoom(roomId) {

@@ -37,8 +37,8 @@ moder  | moder
 
 бит# | действие
 -----|----------------
-0:   | USER_BLOCKING
-1    | USER_UNBLOCKING
+0:   | USER_BAN
+1    | USER_UNBAN
 2    | MODERATOR_SET
 3    | MODERATOR_DELETE
 4    | MESSAGE_SEND
@@ -54,10 +54,10 @@ moder  | moder
 
 #### Примеры ####
 Простой пользователь<br />
-b11101110110000=15280<br />
+b11111110110000=16304<br />
 
 Модератор<br />
-b11101111110011=15347<br />
+b11111111110011=16371<br />
 
 Администратор<br />
 b11111111111111=16383<br />

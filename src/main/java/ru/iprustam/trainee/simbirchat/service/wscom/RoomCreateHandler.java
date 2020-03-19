@@ -12,7 +12,6 @@ import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 import ru.iprustam.trainee.simbirchat.util.room.RoomFactory;
 
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * Обработчик команды "Создание комнаты"
@@ -48,10 +47,10 @@ public class RoomCreateHandler extends BaseMessageHandler {
         ChatRoomType chatRoomType =
                 (chatCommand.hasParam("c")) ? ChatRoomType.PRIVATE_ROOM : ChatRoomType.PUBLIC_ROOM;
         chatRoom = RoomFactory.createChatRoom(chatRoomType, roomName, chatUser);
+        roomService.save(chatRoom);
 
         // Добавить пользователя к комнате
-        chatRoom.setUsers(Set.of(chatUser));
-        roomService.save(chatRoom);
+        chatRoom = roomService.addUserToRoom(chatRoom, chatUser);
 
         DtoPacket packet = dtoTransport.entityToDto("room_create", chatRoom, ChatRoomDto.class);
         messagingTemplate.convertAndSend(

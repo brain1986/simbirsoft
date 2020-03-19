@@ -18,13 +18,8 @@ public class ChatRoom {
     @JoinColumn(name = "owner_user_id", nullable = false)
     private ChatUser owner;
 
-    @ManyToMany
-    @JoinTable(
-            name = "room_user",
-            joinColumns = {@JoinColumn(name = "room_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
-    )
-    private Set<ChatUser> users;
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private Set<RoomUser> roomsUsers;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
     private Set<ChatMessage> messages;
@@ -45,12 +40,12 @@ public class ChatRoom {
         this.roomType = roomType;
     }
 
-    public Set<ChatUser> getUsers() {
-        return users;
+    public Set<RoomUser> getRoomsUsers() {
+        return roomsUsers;
     }
 
-    public void setUsers(Set<ChatUser> users) {
-        this.users = users;
+    public void setRoomsUsers(Set<RoomUser> roomsUsers) {
+        this.roomsUsers = roomsUsers;
     }
 
     public Set<ChatMessage> getMessages() {

@@ -48,15 +48,19 @@ public class UserRenameHandler extends BaseMessageHandler {
 
     @Override
     protected void doHandle(ChatCommand chatCommand) {
+
+        String oP = chatCommand.getParam("o");
+        String nP = chatCommand.getParam("n");
+
         // Update in DB
-        ChatUser chatUserDB = userService.findUser(chatCommand.getParam("o"));
-        chatUserDB.setUsername(chatCommand.getParam("n"));
+        ChatUser chatUserDB = userService.findUser(oP);
+        chatUserDB.setUsername(nP);
         userService.save(chatUserDB);
 
         // Update in session registry
         Optional<ChatUser> chatUserSessionOptional = sessionRegistry.getAllPrincipals().stream()
                 .filter(u -> !sessionRegistry.getAllSessions(u, false).isEmpty())
-                .filter(u -> ((ChatUser)u).getUsername().equals(chatCommand.getParam("o")))
+                .filter(u -> ((ChatUser)u).getUsername().equals(oP))
                 .map(u->(ChatUser)u)
                 .findAny();
 
@@ -67,14 +71,14 @@ public class UserRenameHandler extends BaseMessageHandler {
 
         if(chatUserSessionOptional.isPresent()) {
             ChatUser chatUserSession = chatUserSessionOptional.get();
-            chatUserSession.setUsername(chatCommand.getParam("n"));
+            chatUserSession.setUsername(nP);
         }
 
         messagingTemplate.convertAndSend(
                 "/topic/events-for-all",
                 dtoTransport.entitiesToDtoMap("user_rename",
                         Arrays.asList("userId", "new_username"),
-                        Arrays.asList(chatUserDB.getUserId(), chatCommand.getParam("n")),
+                        Arrays.asList(chatUserDB.getUserId(), nP),
                         Arrays.asList(null, null)));
     }
 
