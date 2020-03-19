@@ -75,11 +75,11 @@ ALTER TABLE ONLY room_user
 
 
 INSERT INTO role (role_id, role_name, authorities) VALUES
-  (1, 'ROLE_ADMIN', 4095), 
-  (2, 'ROLE_MODERATOR', 1011), 
-  (3, 'ROLE_USER', 944),
-  (4, 'ROLE_BOT', 4095),
-  (5, 'ROLE_BLOCKED', 32);
+  (1, 'ROLE_ADMIN', 16383),
+  (2, 'ROLE_MODERATOR', 15347),
+  (3, 'ROLE_USER', 15280),
+  (4, 'ROLE_BOT', 16383),
+  (5, 'ROLE_BLOCKED', 0);
 
 INSERT INTO usr (user_id, password, username, role_id, blocked) VALUES
   (1, '$2a$10$hn03kGjb2fJ6Hc2Zq9JIn.JENytzfs9zlomioihi968O6Sx0.UtES', 'user1', 3, false), 

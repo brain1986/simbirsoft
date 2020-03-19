@@ -4,7 +4,7 @@ import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.Set;
 
-public class ChatRoomDto {
+public class ChatRoomDto extends Dto {
     private Long roomId;
     private ChatRoomType roomType;
     private String roomName;

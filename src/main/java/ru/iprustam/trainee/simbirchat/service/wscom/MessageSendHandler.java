@@ -8,19 +8,28 @@ import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 
 /**
  * Обработчик команды "Текстовое сообщение"
+ * //msg -m {Сообщение}
  */
-public class SendMessageHandler extends BaseMessageHandler {
+public class MessageSendHandler extends BaseMessageHandler {
     @Override
     protected boolean canHandle(ChatCommand chatCommand) {
-        if (chatCommand.getCommand().equals("msg") && chatCommand.getParam("m") != null) {
-            return userService.checkAuthority(
-                    UserUtils.getCurrentPrincipal(), ChatAuthority.MESSAGE_SEND);
-        } else return false;
+        if (!chatCommand.getCommand().equals("msg"))
+            return false;
+        if (chatCommand.getParam("m") == null)
+            return false;
+
+        return userService.checkAuthority(
+                UserUtils.getCurrentPrincipal(), ChatAuthority.MESSAGE_SEND);
     }
 
     @Override
-    protected void doHandle(ChatCommand chatCommand, Long roomId) {
+    protected void doHandle(ChatCommand chatCommand) {
         ChatMessage chatMessage = chatCommand.getChatMessage();
         messageService.save(chatMessage);
+    }
+
+    @Override
+    protected String help() {
+        return "//msg -m {Сообщение}";
     }
 }

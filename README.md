@@ -46,22 +46,21 @@ moder  | moder
 6    | MESSAGE_DELETE
 7    | PUBLIC_ROOM_CREATE
 8    | PRIVATE_ROOM_CREATE
-9    | USER_ADD
+9    | ROOM_CONNECT
 10   | USER_DELETE
 11   | ROOM_RENAME
-12   | ROOM_DELETE
-13   | ROOM_CONNECT
-14   | USER_RENAME
+12   | ROOM_REMOVE
+13   | USER_RENAME
 
 #### Примеры ####
 Простой пользователь<br />
-b001110110000=944<br />
+b11101110110000=15280<br />
 
 Модератор<br />
-b001111110011=1011<br />
+b11101111110011=15347<br />
 
 Администратор<br />
-b111111111111=4095<br />
+b11111111111111=16383<br />
 
 Заблокированный<br />
-b000000100000=32<br />
+b000000000000=0<br />

@@ -1,6 +1,5 @@
 package ru.iprustam.trainee.simbirchat.controller;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,8 @@ public class ChatController {
 
     @GetMapping("/chat")
     public String chatPage(Model model) {
-        model.addAttribute("username", ((UserDetails) UserUtils.getCurrentPrincipal()).getUsername());
+        model.addAttribute("user_id", (UserUtils.getCurrentPrincipal()).getUserId());
+        model.addAttribute("username", (UserUtils.getCurrentPrincipal()).getUsername());
         return "chat";
     }
 

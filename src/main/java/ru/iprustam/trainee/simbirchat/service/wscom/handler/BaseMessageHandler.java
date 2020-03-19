@@ -2,7 +2,9 @@ package ru.iprustam.trainee.simbirchat.service.wscom.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.session.SessionRegistry;
 import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
+import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
@@ -21,6 +23,7 @@ import java.time.ZonedDateTime;
 public abstract class BaseMessageHandler implements MessageHandler {
 
     protected SimpMessagingTemplate messagingTemplate;
+    protected SessionRegistry sessionRegistry;
     protected UserService userService;
     protected DtoTransport dtoTransport;
     protected RoomService roomService;
@@ -28,7 +31,10 @@ public abstract class BaseMessageHandler implements MessageHandler {
     private MessageHandler nextHandler;
 
     abstract protected boolean canHandle(ChatCommand chatCommand);
-    abstract protected void doHandle(ChatCommand chatCommand, Long roomId);
+
+    abstract protected void doHandle(ChatCommand chatCommand) throws Exception;
+
+    abstract protected String help();
 
     @Override
     public final MessageHandler setNext(MessageHandler nextHandler) {
@@ -36,65 +42,86 @@ public abstract class BaseMessageHandler implements MessageHandler {
         return nextHandler;
     }
 
+    /**
+     * Поиск обработчика, готового обработать команду
+     *
+     * @param chatCommand
+     */
     @Override
-    public final void handle(ChatCommand chatCommand, Long roomId) throws Exception {
-        if (canHandle(chatCommand)) {
-            prepareMessageForEcho(chatCommand, roomId);
-            doHandle(chatCommand, roomId);
-            sendEcho(chatCommand, roomId);
-        } else {
-            if (nextHandler != null) {
-                nextHandler.handle(chatCommand, roomId);
+    public final void handle(ChatCommand chatCommand) {
+        try {
+            if (canHandle(chatCommand)) {
+                prepareMessageForEcho(chatCommand);
+                doHandle(chatCommand);
+                if (chatCommand.getCommand().equals("msg"))
+                    sendEchoToRoom(chatCommand);
+                else
+                    sendEchoToUser(chatCommand);
             } else {
-                String error = "Can't handle the request";
-                sendErrorEcho(error, chatCommand, roomId);
-                throw new Exception(error);
+                if (nextHandler != null)
+                    nextHandler.handle(chatCommand);
+                else
+                    throw new Exception("Can't handle the request");
             }
+        } catch (Exception e) {
+            sendCustomMessageToUser(e.getMessage(), chatCommand);
         }
     }
 
-    private void sendEcho(ChatCommand chatCommand, Long roomId) {
-        if(chatCommand.getCommand().equals("msg"))
-            sendEchoToRoom(chatCommand, roomId);
-        else
-            sendEchoUser(chatCommand);
+    /**
+     * Каждый обработчик выдаст информацию о себе и результат будет отправлен
+     * в чат
+     */
+    @Override
+    public void helpCommandsToWs(ChatCommand chatCommand) {
+        StringBuilder helpCommands = new StringBuilder();
+        helpCommands = collectHelpCommands(helpCommands);
+        sendCustomMessageToUser(helpCommands.toString(), chatCommand);
     }
 
-    private void sendErrorEcho(String error, ChatCommand chatCommand, Long roomId) {
-        prepareMessageForEcho(chatCommand, roomId);
-        ChatMessage chatMessage = chatCommand.getChatMessage();
-        chatMessage.setMessage(chatMessage.getMessage() + "<br />" + error);
-        sendEchoUser(chatCommand);
+    public StringBuilder collectHelpCommands(StringBuilder helpCommands) {
+        helpCommands
+                .append("<hr />")
+                .append(help());
+        if (nextHandler != null) {
+            ((BaseMessageHandler) nextHandler).collectHelpCommands(helpCommands);
+        }
+        return helpCommands;
     }
 
     /**
      * Выполняет подготовку объекта сообщения перед отправкой обратно пользователям комнаты
      *
      * @param chatCommand
-     * @param roomId
      */
-    protected void prepareMessageForEcho(ChatCommand chatCommand, Long roomId) {
+    protected void prepareMessageForEcho(ChatCommand chatCommand) {
         ChatUser chatUser = UserUtils.getCurrentPrincipal();
         ChatMessage chatMessage = chatCommand.getChatMessage();
         if (chatCommand.getCommand().equals("msg"))
             chatMessage.setMessage(chatCommand.getParam("m"));
         chatMessage.setChatUser(chatUser);
         ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomId(roomId);
+        chatRoom.setRoomId(chatCommand.getRoomId());
         chatMessage.setChatRoom(chatRoom);
         chatMessage.setMessageTime(ZonedDateTime.now(ZoneId.systemDefault()));
+    }
+
+    private void sendCustomMessageToUser(String message, ChatCommand chatCommand) {
+        prepareMessageForEcho(chatCommand);
+        ChatMessage chatMessage = chatCommand.getChatMessage();
+        chatMessage.setMessage(chatMessage.getMessage() + "<br />" + message);
+        sendEchoToUser(chatCommand);
     }
 
     /**
      * Отправляет сообщение всем пользователям комнаты (для обычных текстовых сообщений)
      *
      * @param chatCommand
-     * @param roomId
      */
-    protected void sendEchoToRoom(ChatCommand chatCommand, Long roomId) {
+    protected void sendEchoToRoom(ChatCommand chatCommand) {
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + roomId,
-                dtoTransport.chatMessageToDto("new_message", chatCommand.getChatMessage()));
+                "/topic/room-concrete/" + chatCommand.getRoomId(),
+                dtoTransport.entityToDto("new_message", chatCommand.getChatMessage(), ChatMessageDto.class));
     }
 
     /**
@@ -102,11 +129,11 @@ public abstract class BaseMessageHandler implements MessageHandler {
      *
      * @param chatCommand
      */
-    protected void sendEchoUser(ChatCommand chatCommand) {
+    protected void sendEchoToUser(ChatCommand chatCommand) {
         ChatUser chatUser = UserUtils.getCurrentPrincipal();
         messagingTemplate.convertAndSend(
                 "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.chatMessageToDto("system_command", chatCommand.getChatMessage()));
+                dtoTransport.entityToDto("system_command", chatCommand.getChatMessage(), ChatMessageDto.class));
     }
 
     @Autowired
@@ -132,5 +159,10 @@ public abstract class BaseMessageHandler implements MessageHandler {
     @Autowired
     public final void setMessageService(MessageService messageService) {
         this.messageService = messageService;
+    }
+
+    @Autowired
+    public final void setSessionRegistry(SessionRegistry sessionRegistry) {
+        this.sessionRegistry = sessionRegistry;
     }
 }

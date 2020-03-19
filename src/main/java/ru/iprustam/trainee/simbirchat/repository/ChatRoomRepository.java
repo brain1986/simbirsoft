@@ -9,10 +9,16 @@ import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     List<ChatRoom> findByRoomType(ChatRoomType roomType);
+    Optional<ChatRoom> findByRoomNameIgnoreCase(String roomName);
+    @Transactional
+    Long deleteByRoomNameIgnoreCase(String roomName);
+
+
 
     @Modifying
     @Transactional

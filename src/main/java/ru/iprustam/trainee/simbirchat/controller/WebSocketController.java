@@ -31,7 +31,7 @@ public class WebSocketController {
     }
 
     @MessageMapping("/message-send/{roomId}")
-    public void messageSend(ChatMessage message, @DestinationVariable Long roomId) throws Exception {
+    public void messageSend(ChatMessage message, @DestinationVariable Long roomId) {
         wsChatService.incomeMessageHandle(message, roomId);
     }
 

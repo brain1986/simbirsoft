@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
+import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
+import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
@@ -12,7 +14,6 @@ import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.MessageHandler;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
-import ru.iprustam.trainee.simbirchat.util.room.RoomFactory;
 
 import java.util.HashSet;
 import java.util.List;
@@ -63,9 +64,10 @@ public class WsChatService {
     public void subscribe() {
         ChatUser chatUser = UserUtils.getCurrentPrincipal();
 
-        ChatRoom defaultRoom = getDefaultPublicRoom(chatUser);
+        ChatRoom defaultRoom = roomService
+                .getOrCreateRoom(ChatRoomType.DEFAULT_PUBLIC_ROOM, "Общая комната", chatUser);
         if (defaultRoom != null) {
-            if (!isUserInRoom(chatUser, defaultRoom.getRoomId())) {
+            if (!userService.isUserInRoom(chatUser, defaultRoom.getRoomId())) {
                 roomService.addUserToRoom(defaultRoom, chatUser);
             }
         }
@@ -77,7 +79,7 @@ public class WsChatService {
 
         messagingTemplate.convertAndSend(
                 "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.chatRoomsToDto("room_list_full", chatRooms));
+                dtoTransport.entitiesToDtoList("room_list_full", chatRooms, ChatRoomDto.class));
     }
 
     /**
@@ -87,14 +89,15 @@ public class WsChatService {
      * @param roomId
      */
     public void roomSubscribe(Long roomId) {
+        ChatUser chatUser = UserUtils.getCurrentPrincipal();
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomId(roomId);
 
         List<ChatMessage> messages = messageService.findMessages(chatRoom);
 
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + roomId,
-                dtoTransport.chatMessagesToDto("room_all_messages", messages));
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
+                dtoTransport.entitiesToDtoList("room_all_messages", messages, ChatMessageDto.class));
     }
 
     /**
@@ -104,26 +107,11 @@ public class WsChatService {
      * @param message
      * @param roomId
      */
-    public void incomeMessageHandle(ChatMessage message, Long roomId) throws Exception {
-        ChatCommand chatCommand = ChatCommand.createChatCommand(message);
-        messageHandler.handle(chatCommand, roomId);
-    }
-
-    private ChatRoom getDefaultPublicRoom(ChatUser chatUser) {
-        List<ChatRoom> rooms = roomService.findRooms(ChatRoomType.DEFAULT_PUBLIC_ROOM);
-
-        if (!rooms.isEmpty()) {
-            return rooms.get(0);
-        } else {
-            ChatRoom defaultRoom = RoomFactory.createDefaultPublicRoom(chatUser);
-            roomService.save(defaultRoom);
-            return defaultRoom;
-        }
-    }
-
-    private boolean isUserInRoom(ChatUser chatUser, Long roomId) {
-        return userService
-                .findUsers(roomId)
-                .stream().anyMatch(u -> u.getUserId() == chatUser.getUserId());
+    public void incomeMessageHandle(ChatMessage message, Long roomId) {
+        ChatCommand chatCommand = ChatCommand.createChatCommand(message, roomId);
+        if(chatCommand.getCommand().equals("help"))
+            messageHandler.helpCommandsToWs(chatCommand);
+        else
+            messageHandler.handle(chatCommand);
     }
 }
