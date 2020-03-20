@@ -26,7 +26,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        ChatUser user = chatUserRepository.findByUsername(s);
+        ChatUser user = chatUserRepository.findByUsernameIgnoreCase(s);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
@@ -40,6 +40,14 @@ public class UserService implements UserDetailsService {
         return users;
     }
 
+    public ChatUser findUser(String username) {
+        return chatUserRepository.findByUsernameIgnoreCase(username);
+    }
+
+    public boolean isUserInRoom(ChatUser chatUser, Long roomId) {
+        return findUsers(roomId).stream().anyMatch(u -> u.getUserId() == chatUser.getUserId());
+    }
+
     public boolean checkAuthority(ChatUser chatUser, ChatAuthority chatAuthority) {
         return chatUser.getAuthorities().stream()
                 .anyMatch(
@@ -47,4 +55,7 @@ public class UserService implements UserDetailsService {
                 );
     }
 
+    public void save(ChatUser chatUser) {
+        chatUserRepository.save(chatUser);
+    }
 }

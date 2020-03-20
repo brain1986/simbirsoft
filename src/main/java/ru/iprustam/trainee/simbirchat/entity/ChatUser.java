@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -20,9 +21,7 @@ public class ChatUser implements UserDetails {
     private String username;
     private String password;
     private boolean blocked;
-
-    @ManyToMany(mappedBy = "users")
-    private Set<ChatRoom> rooms;
+    private ZonedDateTime globalBlockUntil;
 
     @OneToMany(mappedBy = "chatUser", cascade = CascadeType.REMOVE)
     private Set<ChatMessage> messages;
@@ -31,15 +30,11 @@ public class ChatUser implements UserDetails {
     @JoinColumn(name = "role_id", nullable = false)
     private ChatUserRole role;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
     private Set<ChatRoom> roomsWhichOwn;
 
-    @PreRemove
-    private void removeUser() {
-        for (ChatRoom r : rooms) {
-            r.getUsers().remove(this);
-        }
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<RoomUser> roomsUsers;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -65,12 +60,20 @@ public class ChatUser implements UserDetails {
         this.blocked = blocked;
     }
 
-    public Set<ChatRoom> getRooms() {
-        return rooms;
+    public ZonedDateTime getGlobalBlockUntil() {
+        return globalBlockUntil;
     }
 
-    public void setRooms(Set<ChatRoom> rooms) {
-        this.rooms = rooms;
+    public void setGlobalBlockUntil(ZonedDateTime globalBlockUntil) {
+        this.globalBlockUntil = globalBlockUntil;
+    }
+
+    public Set<RoomUser> getRoomsUsers() {
+        return roomsUsers;
+    }
+
+    public void setRoomsUsers(Set<RoomUser> roomsUsers) {
+        this.roomsUsers = roomsUsers;
     }
 
     public Set<ChatMessage> getMessages() {

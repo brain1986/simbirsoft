@@ -9,10 +9,16 @@ import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     List<ChatRoom> findByRoomType(ChatRoomType roomType);
+
+    Optional<ChatRoom> findByRoomNameIgnoreCase(String roomName);
+
+    @Transactional
+    Long deleteByRoomNameIgnoreCase(String roomName);
 
     @Modifying
     @Transactional
@@ -20,8 +26,14 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     void addRoomUser(Long roomId, Long userId);
 
     @Transactional
-    @Query(value = "SELECT room.* FROM room, room_user WHERE room.room_id=room_user.room_id AND room_user.user_id=:userId " +
+    @Query(value = "SELECT room.*, room_user.block_until FROM room, room_user " +
+            "WHERE room.room_id=room_user.room_id AND room_user.user_id=:userId " +
             "ORDER BY room_id ASC",
             nativeQuery = true)
     List<ChatRoom> findByUserId(Long userId);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "DELETE FROM room_user WHERE room_id=:roomId AND user_id=:userId")
+    void deleteUserFromRoom(Long roomId, Long userId);
 }

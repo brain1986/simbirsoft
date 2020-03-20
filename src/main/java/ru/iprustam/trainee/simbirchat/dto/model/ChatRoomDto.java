@@ -4,11 +4,11 @@ import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.Set;
 
-public class ChatRoomDto {
+public class ChatRoomDto extends Dto {
     private Long roomId;
     private ChatRoomType roomType;
     private String roomName;
-    private Set<ChatUserDto> users;
+    private Set<RoomUserDto> roomsUsers;
 
     public Long getRoomId() {
         return roomId;
@@ -26,12 +26,12 @@ public class ChatRoomDto {
         this.roomName = roomName;
     }
 
-    public Set<ChatUserDto> getUsers() {
-        return users;
+    public Set<RoomUserDto> getRoomsUsers() {
+        return roomsUsers;
     }
 
-    public void setUsers(Set<ChatUserDto> users) {
-        this.users = users;
+    public void setRoomsUsers(Set<RoomUserDto> roomsUsers) {
+        this.roomsUsers = roomsUsers;
     }
 
     public ChatRoomType getRoomType() {
