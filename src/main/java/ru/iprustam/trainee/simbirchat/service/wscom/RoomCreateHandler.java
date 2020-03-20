@@ -39,7 +39,7 @@ public class RoomCreateHandler extends BaseMessageHandler {
         // Проверить есть ли такая комната
         String roomName = chatCommand.getParam("create");
         Optional<ChatRoom> chatRoomOptional = roomService.findRoom(roomName);
-        if(chatRoomOptional.isPresent())
+        if (chatRoomOptional.isPresent())
             throw new Exception("Room with this name already exists");
 
         ChatUser chatUser = UserUtils.getCurrentPrincipal();
@@ -55,7 +55,7 @@ public class RoomCreateHandler extends BaseMessageHandler {
         DtoPacket packet = dtoTransport.entityToDto("room_create", chatRoom, ChatRoomDto.class);
         messagingTemplate.convertAndSend(
                 "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet
-                );
+        );
     }
 
     @Override

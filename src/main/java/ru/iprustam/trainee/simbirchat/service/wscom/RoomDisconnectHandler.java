@@ -59,8 +59,7 @@ public class RoomDisconnectHandler extends BaseMessageHandler {
             if (currentUser.getRole().getRoleName().equals("ROLE_MODERATOR"))
                 return true;
 
-            if (chatRoom.get().getOwner().getUserId() == currentUser.getUserId())
-                return true;
+            return chatRoom.get().getOwner().getUserId() == currentUser.getUserId();
         }
 
         return false;

@@ -43,23 +43,20 @@ public class RoomConnectHandler extends BaseMessageHandler {
         if (currentUser.getRole().getRoleName().equals("ROLE_MODERATOR"))
             return true;
 
-        if(chatRoom.get().getRoomType() == ChatRoomType.DEFAULT_PUBLIC_ROOM)
+        if (chatRoom.get().getRoomType() == ChatRoomType.DEFAULT_PUBLIC_ROOM)
             return true;
 
-        if(chatRoom.get().getRoomType() == ChatRoomType.PUBLIC_ROOM)
+        if (chatRoom.get().getRoomType() == ChatRoomType.PUBLIC_ROOM)
             return true;
 
-        if(chatRoom.get().getOwner().getUserId() == currentUser.getUserId())
-            return true;
-
-        return false;
+        return chatRoom.get().getOwner().getUserId() == currentUser.getUserId();
     }
 
     @Override
     protected void doHandle(ChatCommand chatCommand) throws Exception {
         String roomName = chatCommand.getParam("connect");
         ChatUser chatUser;
-        if(chatCommand.getParam("l") != null)
+        if (chatCommand.getParam("l") != null)
             chatUser = userService.findUser(chatCommand.getParam("l"));
         else
             chatUser = userService.findUser(UserUtils.getCurrentPrincipal().getUsername());
@@ -74,10 +71,10 @@ public class RoomConnectHandler extends BaseMessageHandler {
         else {
             // Проверить не заблокирован ли юзер
             Optional<RoomUser> roomUser = chatUser.getRoomsUsers().stream()
-                    .filter(ru-> ru.getUser().getUserId() == chatUser.getUserId())
-                    .filter(ru->ru.getBlockUntil().isAfter(ZonedDateTime.now()))
+                    .filter(ru -> ru.getUser().getUserId() == chatUser.getUserId())
+                    .filter(ru -> ru.getBlockUntil().isAfter(ZonedDateTime.now()))
                     .findAny();
-            if(roomUser.isPresent())
+            if (roomUser.isPresent())
                 throw new Exception("This user blocked until " + roomUser.get().getBlockUntil());
             throw new Exception("This user is already in the room ");
         }

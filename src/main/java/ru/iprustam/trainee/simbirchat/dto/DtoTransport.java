@@ -61,7 +61,7 @@ public class DtoTransport {
                                       List<? extends Object> entitiesValues,
                                       List<? extends Class<? extends Dto>> entitiesClasses) {
         Map<String, Object> dtoMap = new HashMap<>();
-        for(int i=0; i<entitiesKeys.size(); i++) {
+        for (int i = 0; i < entitiesKeys.size(); i++) {
             Class dtoClass = entitiesClasses.get(i);
             Object dtoObject = entitiesValues.get(i);
             if (dtoClass != null) // использовать ли ModelMapper

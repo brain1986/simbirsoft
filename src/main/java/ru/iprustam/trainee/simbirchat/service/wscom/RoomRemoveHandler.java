@@ -32,10 +32,7 @@ public class RoomRemoveHandler extends BaseMessageHandler {
         if (currentUser.getRole().getRoleName().equals("ROLE_ADMIN"))
             return true;
 
-        if(chatRoom.get().getOwner().getUserId() == currentUser.getUserId())
-            return true;
-
-        return false;
+        return chatRoom.get().getOwner().getUserId() == currentUser.getUserId();
     }
 
     @Override

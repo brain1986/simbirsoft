@@ -14,7 +14,9 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     List<ChatRoom> findByRoomType(ChatRoomType roomType);
+
     Optional<ChatRoom> findByRoomNameIgnoreCase(String roomName);
+
     @Transactional
     Long deleteByRoomNameIgnoreCase(String roomName);
 

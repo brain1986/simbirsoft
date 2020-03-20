@@ -40,10 +40,7 @@ public class UserRenameHandler extends BaseMessageHandler {
         if (currentUser.getRole().getRoleName().equals("ROLE_ADMIN"))
             return true;
 
-        if(currentUser.getUsername().equals(chatCommand.getParam("o")))
-            return true;
-
-        return false;
+        return currentUser.getUsername().equals(chatCommand.getParam("o"));
     }
 
     @Override
@@ -60,16 +57,16 @@ public class UserRenameHandler extends BaseMessageHandler {
         // Update in session registry
         Optional<ChatUser> chatUserSessionOptional = sessionRegistry.getAllPrincipals().stream()
                 .filter(u -> !sessionRegistry.getAllSessions(u, false).isEmpty())
-                .filter(u -> ((ChatUser)u).getUsername().equals(oP))
-                .map(u->(ChatUser)u)
+                .filter(u -> ((ChatUser) u).getUsername().equals(oP))
+                .map(u -> (ChatUser) u)
                 .findAny();
 
         List jjj = sessionRegistry.getAllPrincipals().stream()
                 .filter(u -> !sessionRegistry.getAllSessions(u, false).isEmpty())
-                .map(u->(ChatUser)u)
+                .map(u -> (ChatUser) u)
                 .collect(Collectors.toList());
 
-        if(chatUserSessionOptional.isPresent()) {
+        if (chatUserSessionOptional.isPresent()) {
             ChatUser chatUserSession = chatUserSessionOptional.get();
             chatUserSession.setUsername(nP);
         }

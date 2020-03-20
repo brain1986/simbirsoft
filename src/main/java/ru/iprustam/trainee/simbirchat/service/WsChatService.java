@@ -107,7 +107,7 @@ public class WsChatService {
      */
     public void incomeMessageHandle(ChatMessage message, Long roomId) {
         ChatCommand chatCommand = ChatCommand.createChatCommand(message, roomId);
-        if(chatCommand.getCommand().equals("help"))
+        if (chatCommand.getCommand().equals("help"))
             messageHandler.helpCommandsToWs(chatCommand);
         else
             messageHandler.handle(chatCommand);
