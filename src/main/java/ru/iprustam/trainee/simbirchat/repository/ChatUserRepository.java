@@ -9,15 +9,10 @@ import java.util.List;
 
 @Repository
 public interface ChatUserRepository extends JpaRepository<ChatUser, Long> {
-    ChatUser findByUsername(String username);
+    ChatUser findByUsernameIgnoreCase(String username);
 
-    @Query(value = "SELECT usr.* FROM room_user, usr WHERE usr.user_id=room_user.user_id AND room_id=:roomId",
+    @Query(value = "SELECT usr.*, room_user.block_until FROM room_user, usr " +
+            "WHERE usr.user_id=room_user.user_id AND room_id=:roomId",
             nativeQuery = true)
     List<ChatUser> findByRoomId(Long roomId);
-
-
-//    void addUser(ChatUser user);
-//    void deleteUser(Integer userId);
-//    ChatUser findUserById(Integer userId);
-//    List<ChatUser> findAllUsers();
 }

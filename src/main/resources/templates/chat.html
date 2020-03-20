@@ -9,6 +9,7 @@
         /*<![CDATA[*/
         var csrfHeaderName = /*[[${_csrf.headerName}]]*/ '';
         var csrfHeaderValue = /*[[${_csrf.token}]]*/ '';
+        var userId = /*[[${user_id}]]*/ '';
         /*]]>*/
     </script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
@@ -20,7 +21,7 @@
 
 <div class="container" id="main-content">
     <div class="row">
-        <h3 th:text="${username}"></h3>
+        <h3 th:attr="user_id=${user_id}" th:text="${username}"></h3>
         <div id="welcome-user"></div>
     </div>
     <div class="row">
