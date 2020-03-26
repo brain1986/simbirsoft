@@ -1,27 +1,32 @@
 package ru.iprustam.trainee.simbirchat.entity;
 
-import ru.iprustam.trainee.simbirchat.entity.composite.RoomUserCompositeId;
-
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "room_user")
-public class RoomUser {
-    @EmbeddedId
-    private RoomUserCompositeId id;
+@Table(name = "room_user_block")
+public class ChatRoomUserBlock {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @MapsId("room")
     @JoinColumn(name = "room_id")
     private ChatRoom room;
 
     @ManyToOne
-    @MapsId("user")
     @JoinColumn(name = "user_id")
     private ChatUser user;
 
     private ZonedDateTime blockUntil;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public ChatRoom getRoom() {
         return room;

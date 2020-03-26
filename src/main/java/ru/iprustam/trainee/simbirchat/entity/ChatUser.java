@@ -10,7 +10,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "usr")
@@ -20,21 +19,12 @@ public class ChatUser implements UserDetails {
     private Long userId;
     private String username;
     private String password;
-    private boolean blocked;
     private ZonedDateTime globalBlockUntil;
+    private boolean isDeleted;
 
-    @OneToMany(mappedBy = "chatUser", cascade = CascadeType.REMOVE)
-    private Set<ChatMessage> messages;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private ChatUserRole role;
-
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.REMOVE)
-    private Set<ChatRoom> roomsWhichOwn;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<RoomUser> roomsUsers;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -52,36 +42,12 @@ public class ChatUser implements UserDetails {
         return authorities;
     }
 
-    public boolean isBlocked() {
-        return blocked;
-    }
-
-    public void setBlocked(boolean blocked) {
-        this.blocked = blocked;
-    }
-
     public ZonedDateTime getGlobalBlockUntil() {
         return globalBlockUntil;
     }
 
     public void setGlobalBlockUntil(ZonedDateTime globalBlockUntil) {
         this.globalBlockUntil = globalBlockUntil;
-    }
-
-    public Set<RoomUser> getRoomsUsers() {
-        return roomsUsers;
-    }
-
-    public void setRoomsUsers(Set<RoomUser> roomsUsers) {
-        this.roomsUsers = roomsUsers;
-    }
-
-    public Set<ChatMessage> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(Set<ChatMessage> messages) {
-        this.messages = messages;
     }
 
     public ChatUserRole getRole() {
@@ -100,12 +66,12 @@ public class ChatUser implements UserDetails {
         this.userId = userId;
     }
 
-    public Set<ChatRoom> getRoomsWhichOwn() {
-        return roomsWhichOwn;
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
-    public void setRoomsWhichOwn(Set<ChatRoom> roomsWhichOwn) {
-        this.roomsWhichOwn = roomsWhichOwn;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     @Override
@@ -128,21 +94,21 @@ public class ChatUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !isDeleted;
     }
 }

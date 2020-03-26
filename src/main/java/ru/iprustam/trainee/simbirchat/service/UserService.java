@@ -5,11 +5,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.repository.ChatUserRepository;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
-
-import java.util.List;
 
 /**
  * Предоставляет сервис работы с пользователями
@@ -35,17 +34,12 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<ChatUser> findUsers(Long roomId) {
-        List<ChatUser> users = chatUserRepository.findByRoomId(roomId);
-        return users;
-    }
-
     public ChatUser findUser(String username) {
         return chatUserRepository.findByUsernameIgnoreCase(username);
     }
 
-    public boolean isUserInRoom(ChatUser chatUser, Long roomId) {
-        return findUsers(roomId).stream().anyMatch(u -> u.getUserId() == chatUser.getUserId());
+    public boolean isUserInRoom(ChatRoom chatRoom, Long userId) {
+        return chatRoom.getUsers().stream().anyMatch(u -> u.getUserId() == userId);
     }
 
     public boolean checkAuthority(ChatUser chatUser, ChatAuthority chatAuthority) {

@@ -13,16 +13,25 @@ public class ChatRoom {
     private Long roomId;
     private ChatRoomType roomType;
     private String roomName;
+    private boolean isDeleted;
 
     @ManyToOne
-    @JoinColumn(name = "owner_user_id", nullable = false)
+    @JoinColumn(name = "owner_user_id")
     private ChatUser owner;
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
-    private Set<RoomUser> roomsUsers;
+    @ManyToMany
+    @JoinTable(
+            name = "room_user",
+            joinColumns = {@JoinColumn(name = "room_id")},
+            inverseJoinColumns = {@JoinColumn(name = "user_id")}
+    )
+    private Set<ChatUser> users;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "chatRoom")
     private Set<ChatMessage> messages;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ChatRoomUserBlock> usersBlock;
 
     public Long getRoomId() {
         return roomId;
@@ -40,12 +49,12 @@ public class ChatRoom {
         this.roomType = roomType;
     }
 
-    public Set<RoomUser> getRoomsUsers() {
-        return roomsUsers;
+    public Set<ChatUser> getUsers() {
+        return users;
     }
 
-    public void setRoomsUsers(Set<RoomUser> roomsUsers) {
-        this.roomsUsers = roomsUsers;
+    public void setUsers(Set<ChatUser> users) {
+        this.users = users;
     }
 
     public Set<ChatMessage> getMessages() {
@@ -70,5 +79,21 @@ public class ChatRoom {
 
     public void setOwner(ChatUser owner) {
         this.owner = owner;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public Set<ChatRoomUserBlock> getUsersBlock() {
+        return usersBlock;
+    }
+
+    public void setUsersBlock(Set<ChatRoomUserBlock> usersBlock) {
+        this.usersBlock = usersBlock;
     }
 }

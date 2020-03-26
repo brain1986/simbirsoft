@@ -4,10 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.iprustam.trainee.simbirchat.dto.DtoMapper;
 import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
-import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
@@ -15,6 +13,7 @@ import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.MessageHandler;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class WsChatService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final UserService userService;
-    private DtoTransport dtoTransport;
+    private DtoMapper dtoMapper;
     private RoomService roomService;
     private MessageService messageService;
     private MessageHandler messageHandler;
@@ -43,8 +42,8 @@ public class WsChatService {
     }
 
     @Autowired
-    public void setDtoTransport(DtoTransport dtoTransport) {
-        this.dtoTransport = dtoTransport;
+    public void setDtoMapper(DtoMapper dtoMapper) {
+        this.dtoMapper = dtoMapper;
     }
 
     @Autowired
@@ -67,17 +66,16 @@ public class WsChatService {
         ChatRoom defaultRoom = roomService
                 .getOrCreateRoom(ChatRoomType.DEFAULT_PUBLIC_ROOM, "Общая комната", chatUser);
         if (defaultRoom != null) {
-            if (!userService.isUserInRoom(chatUser, defaultRoom.getRoomId())) {
+            if (!userService.isUserInRoom(defaultRoom, chatUser.getUserId())) {
                 roomService.addUserToRoom(defaultRoom, chatUser);
             }
         }
 
         List<ChatRoom> chatRooms = roomService.getRoomsWhereUserIn(chatUser);
 
-        DtoPacket packet = dtoTransport.entitiesToDtoList("room_list_full", chatRooms, ChatRoomDto.class);
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_LIST_FULL, dtoMapper.roomToDto(chatRooms));
         messagingTemplate.convertAndSend(
-                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                packet);
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
     }
 
     /**
@@ -93,9 +91,9 @@ public class WsChatService {
 
         List<ChatMessage> messages = messageService.findMessages(chatRoom);
 
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_ALL_MESSAGES, dtoMapper.msgToDto(messages));
         messagingTemplate.convertAndSend(
-                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.entitiesToDtoList("room_all_messages", messages, ChatMessageDto.class));
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
     }
 
     /**

@@ -1,12 +1,13 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
-import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.util.Optional;
 
@@ -51,9 +52,9 @@ public class RoomRenameHandler extends BaseMessageHandler {
         chatRoom.setRoomName(roomNameNew);
         roomService.save(chatRoom);
 
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_RENAME, dtoMapper.roomToDto(chatRoom));
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + chatCommand.getRoomId(),
-                dtoTransport.entityToDto("room_rename", chatRoom, ChatRoomDto.class));
+                "/topic/room-concrete/" + chatCommand.getRoomId(), packet);
     }
 
     @Override

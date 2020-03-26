@@ -1,15 +1,15 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
 import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatUserDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -97,11 +97,8 @@ public class RoomDisconnectHandler extends BaseMessageHandler {
         }
 
         // Отправить сообщение об отсоединении
-        DtoPacket packet = dtoTransport.entitiesToDtoMap("room_disconnect",
-                Arrays.asList("roomId", "chatUser"),
-                Arrays.asList(chatRoom.getRoomId(), chatUser),
-                Arrays.asList(null, ChatUserDto.class)
-        );
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_DISCONNECT,
+                Map.of("roomId", chatRoom.getRoomId(), "chatUser", dtoMapper.userToDto(chatUser)));
         messagingTemplate.convertAndSend(
                 "/topic/room-concrete/" + chatRoom.getRoomId(), packet
         );

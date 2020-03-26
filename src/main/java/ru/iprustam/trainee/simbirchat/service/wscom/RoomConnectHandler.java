@@ -1,20 +1,20 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
 import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatUserDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
+import ru.iprustam.trainee.simbirchat.entity.ChatRoomUserBlock;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
-import ru.iprustam.trainee.simbirchat.entity.RoomUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Обработчик команды "Войти в комнату"
@@ -66,31 +66,35 @@ public class RoomConnectHandler extends BaseMessageHandler {
             throw new Exception("There is no such room");
 
         ChatRoom chatRoom = chatRoomOptional.get();
-        if (!userService.isUserInRoom(chatUser, chatRoom.getRoomId()))
-            chatRoom = roomService.addUserToRoom(chatRoom, chatUser);
-        else {
-            // Проверить не заблокирован ли юзер
-            Optional<RoomUser> roomUser = chatUser.getRoomsUsers().stream()
-                    .filter(ru -> ru.getUser().getUserId() == chatUser.getUserId())
-                    .filter(ru -> ru.getBlockUntil().isAfter(ZonedDateTime.now()))
-                    .findAny();
-            if (roomUser.isPresent())
-                throw new Exception("This user blocked until " + roomUser.get().getBlockUntil());
-            throw new Exception("This user is already in the room ");
-        }
+
+        // Очистить заблокированных юзеров, у которых срок блока истек
+        Predicate<ChatRoomUserBlock> qualify = ub -> ub.getBlockUntil().isBefore(ZonedDateTime.now());
+        chatRoom.getUsersBlock().removeIf(qualify);
+        roomService.save(chatRoom);
+
+        // Проверить не заблокирован ли юзер
+        Predicate<ChatRoomUserBlock> p = u -> u.getUser().getUserId() == chatUser.getUserId()
+                && u.getBlockUntil().isAfter(ZonedDateTime.now());
+
+        Optional<ChatRoomUserBlock> block = chatRoom.getUsersBlock().stream().filter(p).findAny();
+        if (block.isPresent())
+            throw new Exception("This user blocked until " + block.get().getBlockUntil());
+
+        if (!userService.isUserInRoom(chatRoom, chatUser.getUserId())) {
+            chatRoom.getUsers().add(chatUser);
+            roomService.save(chatRoom);
+        } else throw new Exception("This user is already in the room ");
+
 
         // Добавляем к списку юзеров комнаты
-        DtoPacket packet = dtoTransport.entitiesToDtoMap("room_connect",
-                Arrays.asList("roomId", "chatUser"),
-                Arrays.asList(chatRoom.getRoomId(), chatUser),
-                Arrays.asList(null, ChatUserDto.class)
-        );
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_CONNECT,
+                Map.of("roomId", chatRoom.getRoomId(), "chatUser", dtoMapper.userToDto(chatUser)));
         messagingTemplate.convertAndSend("/topic/room-concrete/" + chatCommand.getRoomId(), packet);
 
         // Загрузить комнату
+        packet = new DtoPacket(WsEvent.ROOM_CREATE, dtoMapper.roomToDto(chatRoom));
         messagingTemplate.convertAndSend(
-                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.entityToDto("room_create", chatRoom, ChatRoomDto.class));
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
     }
 
     @Override

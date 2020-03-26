@@ -3,7 +3,6 @@ package ru.iprustam.trainee.simbirchat.entity;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name = "role")
@@ -14,9 +13,6 @@ public class ChatUserRole {
     private String roleName;
     @ColumnDefault("0")
     private Short authorities;
-
-    @OneToMany(mappedBy = "role")
-    private Set<ChatUser> users;
 
     public Short getRoleId() {
         return roleId;
@@ -32,14 +28,6 @@ public class ChatUserRole {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
-    }
-
-    public Set<ChatUser> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<ChatUser> users) {
-        this.users = users;
     }
 
     public Short getAuthorities() {

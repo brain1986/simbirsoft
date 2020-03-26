@@ -12,7 +12,7 @@ https://cloud.mail.ru/public/6JHE/48ffxAwij<br />
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #### Схема БД ####
-https://dbdesigner.page.link/AwfVBy1yfAadXZ6F8<br />
+https://dbdesigner.page.link/ZGqsA9AumKJcasfH9<br />
 
 Дамп БД (для flyway):<br />
 *src/main/resources/db/migration/V1_1_0__initial.sql*<br />

@@ -1,8 +1,8 @@
-package ru.iprustam.trainee.simbirchat.dto.model;
+package ru.iprustam.trainee.simbirchat.dto;
 
 import java.time.ZonedDateTime;
 
-public class ChatMessageDto extends Dto {
+public class ChatMessageDto {
     private Long messageId;
     private String message;
     private ZonedDateTime messageTime;
