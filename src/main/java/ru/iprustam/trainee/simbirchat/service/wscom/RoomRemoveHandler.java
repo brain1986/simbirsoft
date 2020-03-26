@@ -1,11 +1,13 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.util.Optional;
 
@@ -38,13 +40,12 @@ public class RoomRemoveHandler extends BaseMessageHandler {
     @Override
     protected void doHandle(ChatCommand chatCommand) throws Exception {
         String roomName = chatCommand.getParam("remove");
-        Long deletedCount = roomService.deleteRoom(roomName);
-        if (deletedCount == 0)
-            throw new Exception("None of the rooms deleted");
+        roomService.deleteRoom(roomName);
 
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_REMOVE, roomName);
         messagingTemplate.convertAndSend(
                 "/topic/room-concrete/" + chatCommand.getRoomId(),
-                dtoTransport.objectToDto("room_remove", roomName));
+                packet);
     }
 
     @Override

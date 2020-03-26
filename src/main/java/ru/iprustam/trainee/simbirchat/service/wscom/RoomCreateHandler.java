@@ -1,7 +1,6 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
 import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatRoomDto;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
@@ -10,8 +9,10 @@ import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 import ru.iprustam.trainee.simbirchat.util.room.RoomFactory;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Обработчик команды "Создание комнаты"
@@ -47,12 +48,10 @@ public class RoomCreateHandler extends BaseMessageHandler {
         ChatRoomType chatRoomType =
                 (chatCommand.hasParam("c")) ? ChatRoomType.PRIVATE_ROOM : ChatRoomType.PUBLIC_ROOM;
         chatRoom = RoomFactory.createChatRoom(chatRoomType, roomName, chatUser);
+        chatRoom.setUsers(Set.of(chatUser));
         roomService.save(chatRoom);
 
-        // Добавить пользователя к комнате
-        chatRoom = roomService.addUserToRoom(chatRoom, chatUser);
-
-        DtoPacket packet = dtoTransport.entityToDto("room_create", chatRoom, ChatRoomDto.class);
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_CREATE, dtoMapper.roomToDto(chatRoom));
         messagingTemplate.convertAndSend(
                 "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet
         );

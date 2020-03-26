@@ -25,7 +25,7 @@ function userCommonEvents() {
     roomCommonSubscription = stompClient.subscribe('/user/queue/rooms-common-events', function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
         switch (data.eventType) {
-            case "room_list_full": {
+            case "ROOM_LIST_FULL": {
                 $("#room-buttons").empty();
                 $("#users-table").empty();
                 for (i = 0; i < data.data.length; i++) {
@@ -45,35 +45,35 @@ function roomConcreteEvents(room) {
     stompClient.subscribe('/topic/room-concrete/' + room.roomId, function (messageFromServer) {
         data = JSON.parse(messageFromServer.body);
         switch (data.eventType) {
-            case "new_message":
+            case "NEW_MESSAGE":
                 new_message(data.data);
                 break;
-            case "room_all_messages":
+            case "ROOM_ALL_MESSAGES":
                 room_all_messages(data.data);
                 break;
-            case "system_command":
+            case "SYSTEM_COMMAND":
                 new_message(data.data);
                 break;
-            case "room_create":
+            case "ROOM_CREATE":
                 // Если комната уже загружена, не грузим
                 if (!$("#room-buttons .show-room-button[room_id='" + data.roomId + "']").length) {
                     room_list_full(data.data);
                     roomConcreteEvents(data.data);
                 }
                 break;
-            case "room_remove":
+            case "ROOM_REMOVE":
                 room_remove(data.data);
                 break;
-            case "room_rename":
+            case "ROOM_RENAME":
                 room_rename(data.data);
                 break;
-            case "room_connect":
+            case "ROOM_CONNECT":
                 room_connect(data.data);
                 break;
-            case "user_rename":
+            case "USER_RENAME":
                 user_rename(data.data);
                 break;
-            case "room_disconnect":
+            case "ROOM_DISCONNECT":
                 room_disconnect(data.data);
                 break;
         }
@@ -95,8 +95,8 @@ function room_list_full(room) {
         selectRoom(room.roomId);
     }
 
-    for (k = 0; k < room.roomsUsers.length; k++) {
-        addUser(room.roomId, room.roomsUsers[k].user);
+    for (k = 0; k < room.users.length; k++) {
+        addUser(room.roomId, room.users[k]);
     }
 }
 

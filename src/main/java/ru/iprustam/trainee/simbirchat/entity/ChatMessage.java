@@ -13,11 +13,11 @@ public class ChatMessage {
     private ZonedDateTime messageTime;
 
     @ManyToOne
-    @JoinColumn(name = "room_id")//, nullable=false)
+    @JoinColumn(name = "room_id")
     private ChatRoom chatRoom;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private ChatUser chatUser;
 
     public Long getMessageId() {

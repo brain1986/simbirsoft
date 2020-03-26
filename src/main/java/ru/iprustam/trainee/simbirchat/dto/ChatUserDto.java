@@ -1,6 +1,6 @@
-package ru.iprustam.trainee.simbirchat.dto.model;
+package ru.iprustam.trainee.simbirchat.dto;
 
-public class ChatUserDto extends Dto {
+public class ChatUserDto {
     private Long userId;
     private String username;
 

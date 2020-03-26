@@ -1,12 +1,14 @@
 package ru.iprustam.trainee.simbirchat.service.wscom;
 
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.BaseMessageHandler;
 import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
-import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -64,12 +66,11 @@ public class UserRenameHandler extends BaseMessageHandler {
             chatUserSession.setUsername(nP);
         }
 
+        DtoPacket packet = new DtoPacket(WsEvent.USER_RENAME,
+                Map.of("userId", chatUserDB.getUserId(), "new_username", nP));
         messagingTemplate.convertAndSend(
-                "/topic/events-for-all",
-                dtoTransport.entitiesToDtoMap("user_rename",
-                        Arrays.asList("userId", "new_username"),
-                        Arrays.asList(chatUserDB.getUserId(), nP),
-                        Arrays.asList(null, null)));
+                "/topic/events-for-all", packet);
+
     }
 
     @Override

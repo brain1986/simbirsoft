@@ -3,8 +3,8 @@ package ru.iprustam.trainee.simbirchat.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
+import ru.iprustam.trainee.simbirchat.entity.ChatRoomUserBlock;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
-import ru.iprustam.trainee.simbirchat.entity.RoomUser;
 import ru.iprustam.trainee.simbirchat.repository.ChatRoomRepository;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 import ru.iprustam.trainee.simbirchat.util.room.RoomFactory;
@@ -36,7 +36,7 @@ public class RoomService {
      * @return
      */
     public List<ChatRoom> findRooms(ChatRoomType chatRoomType) {
-        return chatRoomRepository.findByRoomType(chatRoomType);
+        return chatRoomRepository.findByRoomTypeAndIsDeletedFalse(chatRoomType);
     }
 
     public Optional<ChatRoom> findRoom(Long roomId) {
@@ -44,20 +44,21 @@ public class RoomService {
     }
 
     public Optional<ChatRoom> findRoom(String name) {
-        return chatRoomRepository.findByRoomNameIgnoreCase(name);
+        return chatRoomRepository.findByRoomNameIgnoreCaseAndIsDeletedFalse(name);
     }
 
-    public Long deleteRoom(String name) {
-        return chatRoomRepository.deleteByRoomNameIgnoreCase(name);
+    public void deleteRoom(String name) {
+        Optional<ChatRoom> chatRoomOptional = chatRoomRepository.findByRoomNameIgnoreCaseAndIsDeletedFalse(name);
+        if (chatRoomOptional.isPresent()) {
+            ChatRoom chatRoom = chatRoomOptional.get();
+            chatRoom.setDeleted(true);
+            save(chatRoom);
+        }
     }
 
     public ChatRoom addUserToRoom(ChatRoom chatRoom, ChatUser chatUser) {
-        RoomUser roomUser = new RoomUser();
-        roomUser.setRoom(chatRoom);
-        roomUser.setUser(chatUser);
-        Set<RoomUser> roomsUsers = Set.of(roomUser);
-        chatRoom.setRoomsUsers(roomsUsers);
-        chatRoomRepository.addRoomUser(chatRoom.getRoomId(), chatUser.getUserId());
+        chatRoom.getUsers().add(chatUser);
+        chatRoomRepository.save(chatRoom);
         return chatRoom;
     }
 
@@ -72,15 +73,18 @@ public class RoomService {
         chatRooms = chatRooms.stream()
                 .filter(r ->
                         // Комнаты, где залогиненный юзер заблочен не отображать
-                        r.getRoomsUsers().stream()
+                        r.getUsersBlock().stream()
                                 .noneMatch(ru -> ru.getUser().getUserId() == chatUser.getUserId()
                                         && ru.getBlockUntil().isAfter(ZonedDateTime.now())
                                 )
                 )
                 .peek(r -> {
                     // заблоченных юзеров не показывать
-                    Predicate<RoomUser> blocked = ru -> ru.getBlockUntil().isAfter(ZonedDateTime.now());
-                    r.getRoomsUsers().removeIf(blocked);
+                    List<ChatUser> blockedUsers = r.getUsersBlock().stream().map(ub -> ub.getUser())
+                            .collect(Collectors.toList());
+
+                    Predicate<ChatUser> blocked = u -> blockedUsers.stream().anyMatch(ub -> ub.getUserId() == u.getUserId()); //u.getBlockUntil().isAfter(ZonedDateTime.now());
+                    r.getUsers().removeIf(blocked);
                 })
                 .collect(Collectors.toList());
 
@@ -101,17 +105,22 @@ public class RoomService {
     }
 
     public ChatRoom deleteUserFromRoom(ChatRoom chatRoom, ChatUser chatUser) {
-        Predicate<RoomUser> isQualified = ru -> ru.getUser().getUserId() == chatUser.getUserId();
-        chatRoom.getRoomsUsers().removeIf(isQualified);
-        chatRoomRepository.deleteUserFromRoom(chatRoom.getRoomId(), chatUser.getUserId());
+        chatRoom.getUsers().removeIf(u -> u.getUserId() == chatUser.getUserId());
+        chatRoom.getUsersBlock().removeIf(u -> u.getUser().getUserId() == chatUser.getUserId());
+        chatRoomRepository.save(chatRoom);
+
         return chatRoom;
     }
 
     public ChatRoom blockUserInRoom(ChatRoom chatRoom, ChatUser chatUser, int minutes) {
-        Predicate<RoomUser> isQualified = ru -> ru.getUser().getUserId() == chatUser.getUserId();
-        chatRoom.getRoomsUsers().stream()
-                .filter(isQualified)
-                .forEach(ru -> ru.setBlockUntil(ZonedDateTime.now().plusMinutes(minutes)));
+        ChatRoomUserBlock chatRoomUserBlock = new ChatRoomUserBlock();
+        chatRoomUserBlock.setRoom(chatRoom);
+        chatRoomUserBlock.setUser(chatUser);
+        chatRoomUserBlock.setBlockUntil(ZonedDateTime.now().plusMinutes(minutes));
+        Set<ChatRoomUserBlock> blocks = chatRoom.getUsersBlock();
+        blocks.removeIf(u -> u.getUser().getUserId() == chatUser.getUserId());
+        blocks.add(chatRoomUserBlock);
+
         chatRoom = chatRoomRepository.save(chatRoom);
         return chatRoom;
     }

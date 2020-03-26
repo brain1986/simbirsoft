@@ -3,8 +3,8 @@ package ru.iprustam.trainee.simbirchat.service.wscom.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.session.SessionRegistry;
-import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
-import ru.iprustam.trainee.simbirchat.dto.model.ChatMessageDto;
+import ru.iprustam.trainee.simbirchat.dto.DtoMapper;
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
@@ -12,6 +12,7 @@ import ru.iprustam.trainee.simbirchat.service.MessageService;
 import ru.iprustam.trainee.simbirchat.service.RoomService;
 import ru.iprustam.trainee.simbirchat.service.UserService;
 import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,9 +26,9 @@ public abstract class BaseMessageHandler implements MessageHandler {
     protected SimpMessagingTemplate messagingTemplate;
     protected SessionRegistry sessionRegistry;
     protected UserService userService;
-    protected DtoTransport dtoTransport;
     protected RoomService roomService;
     protected MessageService messageService;
+    protected DtoMapper dtoMapper;
     private MessageHandler nextHandler;
 
     abstract protected boolean canHandle(ChatCommand chatCommand);
@@ -119,9 +120,9 @@ public abstract class BaseMessageHandler implements MessageHandler {
      * @param chatCommand
      */
     protected void sendEchoToRoom(ChatCommand chatCommand) {
+        DtoPacket packet = new DtoPacket(WsEvent.NEW_MESSAGE, dtoMapper.msgToDto(chatCommand.getChatMessage()));
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + chatCommand.getRoomId(),
-                dtoTransport.entityToDto("new_message", chatCommand.getChatMessage(), ChatMessageDto.class));
+                "/topic/room-concrete/" + chatCommand.getRoomId(), packet);
     }
 
     /**
@@ -131,9 +132,9 @@ public abstract class BaseMessageHandler implements MessageHandler {
      */
     protected void sendEchoToUser(ChatCommand chatCommand) {
         ChatUser chatUser = UserUtils.getCurrentPrincipal();
+        DtoPacket packet = new DtoPacket(WsEvent.SYSTEM_COMMAND, dtoMapper.msgToDto(chatCommand.getChatMessage()));
         messagingTemplate.convertAndSend(
-                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.entityToDto("system_command", chatCommand.getChatMessage(), ChatMessageDto.class));
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
     }
 
     @Autowired
@@ -142,13 +143,13 @@ public abstract class BaseMessageHandler implements MessageHandler {
     }
 
     @Autowired
-    public final void setUserService(UserService userService) {
-        this.userService = userService;
+    public void setDtoMapper(DtoMapper dtoMapper) {
+        this.dtoMapper = dtoMapper;
     }
 
     @Autowired
-    public final void setDtoTransport(DtoTransport dtoTransport) {
-        this.dtoTransport = dtoTransport;
+    public final void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     @Autowired

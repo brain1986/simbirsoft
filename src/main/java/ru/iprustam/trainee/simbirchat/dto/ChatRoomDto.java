@@ -1,14 +1,14 @@
-package ru.iprustam.trainee.simbirchat.dto.model;
+package ru.iprustam.trainee.simbirchat.dto;
 
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 
 import java.util.Set;
 
-public class ChatRoomDto extends Dto {
+public class ChatRoomDto {
     private Long roomId;
     private ChatRoomType roomType;
     private String roomName;
-    private Set<RoomUserDto> roomsUsers;
+    private Set<ChatUserDto> users;
 
     public Long getRoomId() {
         return roomId;
@@ -26,12 +26,12 @@ public class ChatRoomDto extends Dto {
         this.roomName = roomName;
     }
 
-    public Set<RoomUserDto> getRoomsUsers() {
-        return roomsUsers;
+    public Set<ChatUserDto> getUsers() {
+        return users;
     }
 
-    public void setRoomsUsers(Set<RoomUserDto> roomsUsers) {
-        this.roomsUsers = roomsUsers;
+    public void setUsers(Set<ChatUserDto> users) {
+        this.users = users;
     }
 
     public ChatRoomType getRoomType() {
