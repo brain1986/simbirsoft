@@ -10,7 +10,7 @@ http://localhost:8080/login<br />
 https://cloud.mail.ru/public/6JHE/48ffxAwij<br />
 
 #### демо видео для v3: ####
-https://cloud.mail.ru/public/SEzV/4hpQ7KufS<br />
+https://cloud.mail.ru/public/M4b7/ZGbZ8UyYU<br />
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 #### Схема БД ####
