@@ -6,10 +6,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "usr")
@@ -19,27 +19,12 @@ public class ChatUser implements UserDetails {
     private Long userId;
     private String username;
     private String password;
-    private boolean blocked;
+    private ZonedDateTime globalBlockUntil;
+    private boolean isDeleted;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<ChatRoom> rooms;
-
-    @OneToMany(mappedBy = "chatUser", cascade = CascadeType.REMOVE)
-    private Set<ChatMessage> messages;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     private ChatUserRole role;
-
-    @OneToMany(mappedBy = "owner")
-    private Set<ChatRoom> roomsWhichOwn;
-
-    @PreRemove
-    private void removeUser() {
-        for (ChatRoom r : rooms) {
-            r.getUsers().remove(this);
-        }
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -57,28 +42,12 @@ public class ChatUser implements UserDetails {
         return authorities;
     }
 
-    public boolean isBlocked() {
-        return blocked;
+    public ZonedDateTime getGlobalBlockUntil() {
+        return globalBlockUntil;
     }
 
-    public void setBlocked(boolean blocked) {
-        this.blocked = blocked;
-    }
-
-    public Set<ChatRoom> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(Set<ChatRoom> rooms) {
-        this.rooms = rooms;
-    }
-
-    public Set<ChatMessage> getMessages() {
-        return messages;
-    }
-
-    public void setMessages(Set<ChatMessage> messages) {
-        this.messages = messages;
+    public void setGlobalBlockUntil(ZonedDateTime globalBlockUntil) {
+        this.globalBlockUntil = globalBlockUntil;
     }
 
     public ChatUserRole getRole() {
@@ -97,12 +66,12 @@ public class ChatUser implements UserDetails {
         this.userId = userId;
     }
 
-    public Set<ChatRoom> getRoomsWhichOwn() {
-        return roomsWhichOwn;
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
-    public void setRoomsWhichOwn(Set<ChatRoom> roomsWhichOwn) {
-        this.roomsWhichOwn = roomsWhichOwn;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
     @Override
@@ -125,21 +94,21 @@ public class ChatUser implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return !isDeleted;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return !isDeleted;
     }
 }

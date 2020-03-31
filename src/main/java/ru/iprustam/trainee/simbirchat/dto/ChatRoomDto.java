@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.dto.model;
+package ru.iprustam.trainee.simbirchat.dto;
 
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
 

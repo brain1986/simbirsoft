@@ -1,4 +1,4 @@
-package ru.iprustam.trainee.simbirchat.dto.model;
+package ru.iprustam.trainee.simbirchat.dto;
 
 public class ChatUserDto {
     private Long userId;

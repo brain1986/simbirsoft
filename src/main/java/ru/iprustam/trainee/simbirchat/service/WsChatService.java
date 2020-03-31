@@ -1,20 +1,20 @@
 package ru.iprustam.trainee.simbirchat.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import ru.iprustam.trainee.simbirchat.dto.DtoTransport;
+import ru.iprustam.trainee.simbirchat.dto.DtoMapper;
+import ru.iprustam.trainee.simbirchat.dto.DtoPacket;
 import ru.iprustam.trainee.simbirchat.entity.ChatMessage;
 import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
+import ru.iprustam.trainee.simbirchat.service.wscom.handler.ChatCommand;
+import ru.iprustam.trainee.simbirchat.service.wscom.handler.MessageHandler;
+import ru.iprustam.trainee.simbirchat.util.role.UserUtils;
 import ru.iprustam.trainee.simbirchat.util.room.ChatRoomType;
-import ru.iprustam.trainee.simbirchat.util.room.RoomFactory;
+import ru.iprustam.trainee.simbirchat.util.wsevent.WsEvent;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -24,108 +24,90 @@ import java.util.List;
 public class WsChatService {
 
     private final SimpMessagingTemplate messagingTemplate;
-    private final RoomService roomService;
     private final UserService userService;
-    private final MessageService messageService;
-    private final DtoTransport dtoTransport;
+    private DtoMapper dtoMapper;
+    private RoomService roomService;
+    private MessageService messageService;
+    private MessageHandler messageHandler;
 
     @Autowired
-    public WsChatService(SimpMessagingTemplate messagingTemplate, RoomService roomService,
-                         UserService userService, MessageService messageService, DtoTransport dtoTransport) {
+    public WsChatService(SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.messagingTemplate = messagingTemplate;
-        this.roomService = roomService;
         this.userService = userService;
+    }
+
+    @Autowired
+    public void setRoomService(RoomService roomService) {
+        this.roomService = roomService;
+    }
+
+    @Autowired
+    public void setDtoMapper(DtoMapper dtoMapper) {
+        this.dtoMapper = dtoMapper;
+    }
+
+    @Autowired
+    public void setMessageService(MessageService messageService) {
         this.messageService = messageService;
-        this.dtoTransport = dtoTransport;
+    }
+
+    @Autowired
+    public void setMessageHandler(@Qualifier("configuredMessageHandler") MessageHandler messageHandler) {
+        this.messageHandler = messageHandler;
     }
 
     /**
-     * Добавляет подписываемого юзера в дефолтную комнату, если его там нет
-     * Отправляет в ответ список комнат и пользователей внутри них
+     * Подписывает юзера в дефолтную комнату, если его там нет.
+     * Отправляет в вебсокет список комнат и пользователей внутри них
      */
     public void subscribe() {
-        ChatUser chatUser = (ChatUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        ChatUser chatUser = UserUtils.getCurrentPrincipal();
 
-        ChatRoom defaultRoom = getDefaultPublicRoom(chatUser);
+        ChatRoom defaultRoom = roomService
+                .getOrCreateRoom(ChatRoomType.DEFAULT_PUBLIC_ROOM, "Общая комната", chatUser);
         if (defaultRoom != null) {
-            if (!isUserInRoom(chatUser, defaultRoom.getRoomId())) {
+            if (!userService.isUserInRoom(defaultRoom, chatUser.getUserId())) {
                 roomService.addUserToRoom(defaultRoom, chatUser);
             }
         }
 
         List<ChatRoom> chatRooms = roomService.getRoomsWhereUserIn(chatUser);
-        for (var room : chatRooms) {
-            room.setUsers(new HashSet<>(userService.findUsers(room.getRoomId())));
-        }
 
-        //Отправить объекты комнат
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_LIST_FULL, dtoMapper.roomToDto(chatRooms));
         messagingTemplate.convertAndSend(
-                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events",
-                dtoTransport.chatRoomsToDto("room_list_full", chatRooms));
-    }
-
-    private ChatRoom getDefaultPublicRoom(ChatUser chatUser) {
-        List<ChatRoom> rooms = roomService.findRooms(ChatRoomType.DEFAULT_PUBLIC_ROOM);
-
-        if (!rooms.isEmpty()) {
-            return rooms.get(0);
-        } else {
-            ChatRoom defaultRoom = RoomFactory.createDefaultPublicRoom(chatUser);
-            roomService.save(defaultRoom);
-            return defaultRoom;
-        }
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
     }
 
     /**
-     * Проверяет присутствие заданного пользователя в заданной комнате
-     *
-     * @param chatUser
-     * @param roomId
-     * @return
-     */
-    public boolean isUserInRoom(ChatUser chatUser, Long roomId) {
-        return userService
-                .findUsers(roomId)
-                .stream().anyMatch(u -> u.getUserId() == chatUser.getUserId());
-    }
-
-    /**
-     * Принимает сообщение от пользователя, записывает в базу и транслирует обратно в вебсокет
-     *
-     * @param message
-     * @param roomId
-     */
-    @PreAuthorize("hasAuthority('MESSAGE_SEND')")
-    public void messageSend(ChatMessage message, Long roomId) {
-        ChatUser chatUser = (ChatUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        message.setChatUser(chatUser);
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setRoomId(roomId);
-        message.setChatRoom(chatRoom);
-        message.setMessageTime(ZonedDateTime.now(ZoneId.systemDefault()));
-
-        messageService.save(message);
-
-        messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + roomId,
-                dtoTransport.chatMessageToDto("new_message", message));
-    }
-
-    /**
-     * Отправляет сообщения из БД пользователям при SUBSCRIBE к вебсокету
+     * Подписывает юзера к комнате.
+     * Отправляет в вебсокет все сообщения данной комнаты
      *
      * @param roomId
      */
-    @PreAuthorize("hasAuthority('MESSAGE_RECEIVE')")
-    public void messagesLoad(Long roomId) {
+    public void roomSubscribe(Long roomId) {
+        ChatUser chatUser = UserUtils.getCurrentPrincipal();
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setRoomId(roomId);
 
         List<ChatMessage> messages = messageService.findMessages(chatRoom);
 
+        DtoPacket packet = new DtoPacket(WsEvent.ROOM_ALL_MESSAGES, dtoMapper.msgToDto(messages));
         messagingTemplate.convertAndSend(
-                "/topic/room-concrete/" + roomId,
-                dtoTransport.chatMessagesToDto("room_all_messages", messages));
+                "/user/" + chatUser.getUsername() + "/queue/rooms-common-events", packet);
+    }
+
+    /**
+     * Обрабатывает входящие сообщения
+     * Отправляет в вебсокет результаты выполнения команды либо текстовое сообщение
+     *
+     * @param message
+     * @param roomId
+     */
+    public void incomeMessageHandle(ChatMessage message, Long roomId) {
+        ChatCommand chatCommand = ChatCommand.createChatCommand(message, roomId);
+        if (chatCommand.getCommand().equals("help"))
+            messageHandler.helpCommandsToWs(chatCommand);
+        else
+            messageHandler.handle(chatCommand);
     }
 }

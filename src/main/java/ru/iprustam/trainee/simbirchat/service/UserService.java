@@ -5,11 +5,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.iprustam.trainee.simbirchat.entity.ChatRoom;
 import ru.iprustam.trainee.simbirchat.entity.ChatUser;
 import ru.iprustam.trainee.simbirchat.repository.ChatUserRepository;
 import ru.iprustam.trainee.simbirchat.util.role.ChatAuthority;
-
-import java.util.List;
 
 /**
  * Предоставляет сервис работы с пользователями
@@ -26,7 +25,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        ChatUser user = chatUserRepository.findByUsername(s);
+        ChatUser user = chatUserRepository.findByUsernameIgnoreCase(s);
 
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
@@ -35,9 +34,12 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<ChatUser> findUsers(Long roomId) {
-        List<ChatUser> users = chatUserRepository.findByRoomId(roomId);
-        return users;
+    public ChatUser findUser(String username) {
+        return chatUserRepository.findByUsernameIgnoreCase(username);
+    }
+
+    public boolean isUserInRoom(ChatRoom chatRoom, Long userId) {
+        return chatRoom.getUsers().stream().anyMatch(u -> u.getUserId() == userId);
     }
 
     public boolean checkAuthority(ChatUser chatUser, ChatAuthority chatAuthority) {
@@ -47,4 +49,7 @@ public class UserService implements UserDetailsService {
                 );
     }
 
+    public void save(ChatUser chatUser) {
+        chatUserRepository.save(chatUser);
+    }
 }
